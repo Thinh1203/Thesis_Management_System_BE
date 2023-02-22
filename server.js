@@ -7,6 +7,8 @@ const app = express();
 dotenv.config();
 
 const department = require('./app/routes/department.route');
+const user = require('./app/routes/user.route');
+const auth = require('./app/routes/auth.route');
 app.use(cors());
 
 app.use(express.json());
@@ -17,9 +19,9 @@ app.get('/', (req, res) => {
     res.json({ message: 'Well come to my app' });
 });
 
- app.use('/api/department', department);
-
-
+app.use('/api/department', department);
+app.use('/api/user', user);
+app.use('/api/auth',auth);
 db.sequelize.authenticate()
     .then(() => {
         

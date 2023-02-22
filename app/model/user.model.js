@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         avatar: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue:'',
         },
 
         username: {
@@ -35,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         code: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue:'',
         },
 
         email: {
@@ -45,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         address: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue:'',
         },
 
         phone: {
@@ -60,11 +63,13 @@ module.exports = (sequelize, DataTypes) => {
         class: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue:'',
         },
 
         courses: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue:'',
         },
 
         created_at: {
@@ -76,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
         updated_at: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
         }
 
     }, {

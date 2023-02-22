@@ -33,7 +33,7 @@ const getOne = async (id) => {
 }
 
 const deleteOne = async (id) => {
-    const findDepartment = await db.departments.findByPk(id)
+    const findDepartment = await db.departments.findByPk(id);
     if(!findDepartment) return new BadRequestError(400, 'Department not found!');
     return await db.departments.destroy({ where: { id: id }});
 }
