@@ -10,6 +10,7 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     operatorsAliases: false,
     logging: false,
+    timezone: '+07:00',
 
     pool: {
         max: 10,
@@ -26,7 +27,7 @@ const sequelize = new Sequelize(
     
     db.users = require('../model/user.model')(sequelize, DataTypes);
     db.councils = require('../model/council.model')(sequelize, DataTypes);
-    db.departments = require('../model/department.model')(sequelize, DataTypes);
+    
     db.notificationdetails = require('../model/notificationdetail.model')(sequelize, DataTypes);
     db.notification = require('../model/notification.model')(sequelize, DataTypes);
     db.pointi = require('../model/pointi.model')(sequelize, DataTypes);
@@ -48,8 +49,6 @@ const sequelize = new Sequelize(
     db.topics.belongsTo(db.users);
 
     // One-To-Many
-    db.departments.hasMany(db.users);
-    db.users.belongsTo(db.departments);
     
     
     db.councils.hasMany(db.topics);
@@ -57,8 +56,8 @@ const sequelize = new Sequelize(
 
     // Many-To-Many
 
-    db.users.belongsToMany(db.notification, {through: db.notificationdetails});
-    db.notification.belongsToMany(db.users, {through: db.notificationdetails});
+    db.users.belongsToMany(db.notification,  { as: 'user_notice',through: db.notificationdetails});
+    db.notification.belongsToMany(db.users, { as: 'notification_detail',through: db.notificationdetails});
 
 
 

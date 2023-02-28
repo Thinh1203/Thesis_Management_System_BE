@@ -1,10 +1,9 @@
-const userServices = require('../services/user.service');
+const pointServices = require('../services/pointi.service');
 
-
-const addUser = async (req, res) => {
+const addApplication = async (req, res) => {
     try {
-    
-        const result = await userServices.addUser(req.body);
+
+        const result = await pointServices.addApplication(req.file, req.body, res.locals.user);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -12,8 +11,8 @@ const addUser = async (req, res) => {
 }
 
 const update = async (req, res) => {
-    try { 
-        const result = await userServices.update(req.file, req.body,req.params.id);    
+    try {
+        const result = await pointServices.updateApplication(req.file, req.body, req.params.id);    
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -22,7 +21,7 @@ const update = async (req, res) => {
 
 const getOne = async (req, res) => {
     try {
-        const result = await userServices.getOne(req.params.id);
+        const result = await pointServices.getOne(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -31,8 +30,7 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        // console.log(res.locals.user.id);
-        const result = await userServices.getAll();
+        const result = await pointServices.getAll();
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -41,26 +39,17 @@ const getAll = async (req, res) => {
 
 const deleteOne = async (req, res) => {
     try {
-        const result = await userServices.deleteOne(req.params.id);
+        const result = await pointServices.deleteApplication(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const updatePassword = async (req, res) => {
-    try {
-        const result = await userServices.updatePassword(req.params.id, req.body);
-        return res.json(result);
-    } catch(error) {
-        return res.status(500).json({ message: error });
-    }
-}
 module.exports = {
-    addUser,
+    addApplication,
     getAll,
     getOne,
     update,
-    deleteOne,
-    updatePassword
+    deleteOne
 }

@@ -1,11 +1,7 @@
-class BadRequestError extends Error {
-    constructor(statusCode, message) {
-        super();
-        this.statusCode = statusCode;
-        this.message = message;
-    }
+const BadRequestError = (statusCode, message) => {
+    return ({ statusCode, error: message});
 }
 
 module.exports = {
-    BadRequestError,
-};
+    BadRequestError
+}

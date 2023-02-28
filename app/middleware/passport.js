@@ -27,13 +27,27 @@ const requireAdmin = (req, res, next) => {
             return res.status(401).json({ message: 'User not found.' });
         }
         if (user.role == 'admin' || user.role == 'tk') {
-            req.user = user;
+            req.user = user;  
             return next();
         }
         return res.status(403).json({ message: 'Admin access required.' });
     })(req, res, next);
 }
 
+const requireUser = (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (err) {
+            return res.status(401).json({ message: 'Authentication failed.' });
+        }
+        if (!user) {
+            return res.status(401).json({ message: 'User not found.' });
+        }
+        res.locals.user = user;   
+        next();
+    })(req, res, next);
+}
+
 module.exports = {
-    requireAdmin
+    requireAdmin,
+    requireUser
 }

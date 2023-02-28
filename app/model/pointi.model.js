@@ -8,20 +8,21 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
 
-        // topic_id: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        // },
-
-        score: {
-            type: DataTypes.DOUBLE,
+        file: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
 
-        grade: {
+        status: {
             type: DataTypes.STRING,
+            allowNull: true,
+        },
+        
+        created_at: {
+            type: DataTypes.DATE,
             allowNull: false,
-        }
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        },
         
     }, {
         timestamps: false,
