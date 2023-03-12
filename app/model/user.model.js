@@ -7,13 +7,8 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             allowNull: false,
         },
-        avatar: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue:'',
-        },
 
-        username: {
+        account: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -23,12 +18,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
 
-        role: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
 
-        name: {
+        fullName: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -50,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue:'',
         },
 
-        phone: {
+        numberPhone: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -58,34 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         gender: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-
-        class: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue:'',
-        },
-
-        courses: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue:'',
-        },
-
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-        },
-
-        updated_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-        }
-
-    }, {
-        timestamps: false,
+        },     
     });
     
     return User;

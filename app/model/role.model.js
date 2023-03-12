@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Topic  = sequelize.define('topics', {
+    const Role  = sequelize.define('roles', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -7,12 +7,12 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         
-        VietnameseName: {
+        code: {
             type: DataTypes.STRING,
             allowNull: false,
         },
 
-        EnglishName: {
+        description: {
             type: DataTypes.STRING,
             allowNull: false,
         }
@@ -21,5 +21,5 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,
     });
 
-    return Topic;
+    return Role;
 }

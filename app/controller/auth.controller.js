@@ -4,26 +4,25 @@ const bcrypt = require('bcryptjs');
 
 
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { account, password } = req.body;
 
-    const checkUser = await db.users.findOne({ where: { username: username }});
+    const checkUser = await db.users.findOne({ where: { account: account }});
     if(!checkUser) 
         return res.status(400).json({ message: 'User is not found!'});
     if(!bcrypt.compareSync(password, checkUser.password)) 
     return res.status(400).json({ message: 'Password is not match!'});
 
+    const userRole = await db.roles.findOne({ where: { id: checkUser.id }});
+
     const jwtToken = jwt.sign({ 
         id: checkUser.id, 
-        username: checkUser.username, 
-        role: checkUser.role }, process.env.JWT_SECRET);
+        account: checkUser.account, 
+        role: userRole.code }, process.env.JWT_SECRET);
     return res.status(200).json({ token: jwtToken });
 }
 
-const testLogin = async (req, res) => {
-    return res.status(200).json({'login user':'ok'});
-}
 
 module.exports = {
     login,
-    testLogin
+
 }

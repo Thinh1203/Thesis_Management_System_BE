@@ -1,18 +1,18 @@
-const userServices = require('../services/user.service');
+const thesesService = require('../services/theses.service');
 
-
-const addUser = async (req, res) => {
+const addTheses = async (req, res) => {
     try {
-        const result = await userServices.addUser(req.body);
+   
+        const result = await thesesService.addTheses(req.body);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const updateUser = async (req, res) => {
-    try { 
-        const result = await userServices.updateUser(req.body,req.params.id);    
+const updateTheses = async (req, res) => {
+    try {
+        const result = await thesesService.updateTheses(req.body, req.params.id);    
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -21,7 +21,7 @@ const updateUser = async (req, res) => {
 
 const getOne = async (req, res) => {
     try {
-        const result = await userServices.getOne(req.params.id);
+        const result = await thesesService.getOne(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -30,36 +30,36 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        // console.log(res.locals.user.id);
-        const result = await userServices.getAll();
+        const result = await thesesService.getAll();
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const deleteUser = async (req, res) => {
+const deleteTheses = async (req, res) => {
     try {
-        const result = await userServices.deleteUser(req.params.id);
+        const result = await thesesService.deleteTheses(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const updatePassword = async (req, res) => {
-    try {
-        const result = await userServices.updatePassword(req.params.id, req.body);
+const uploadFile = async (req, res) => {
+    try{
+        const result = await thesesService.uploadFile(req.file, req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
+
 module.exports = {
-    addUser,
+    addTheses,
     getAll,
     getOne,
-    updateUser,
-    deleteUser,
-    updatePassword
+    updateTheses,
+    deleteTheses,
+    uploadFile
 }

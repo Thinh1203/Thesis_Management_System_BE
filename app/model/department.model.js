@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
 
-    const Result  = sequelize.define('results', {
+    const Department  = sequelize.define('departments', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -8,25 +8,21 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
 
-        // topic_id: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        // },
-
-        score: {
-            type: DataTypes.DOUBLE,
+        code: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
 
-        grade: {
+        description: {
             type: DataTypes.STRING,
             allowNull: false,
-        }
+        },
+
         
     }, {
         timestamps: false,
     });
 
-    return Result;
+    return Department;
 }
 

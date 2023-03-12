@@ -26,7 +26,7 @@ const requireAdmin = (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: 'User not found.' });
         }
-        if (user.role == 'admin' || user.role == 'tk') {
+        if (user.role == 'admin' || user.role == 'TK') {
             req.user = user;  
             return next();
         }

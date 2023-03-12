@@ -1,18 +1,17 @@
-const pointServices = require('../services/pointi.service');
+const roleService = require('../services/role.service');
 
-const addApplication = async (req, res) => {
+const addRole = async (req, res) => {
     try {
-
-        const result = await pointServices.addApplication(req.file, req.body, res.locals.user);
+        const result = await roleService.addRole(req.body);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const update = async (req, res) => {
+const updateRole = async (req, res) => {
     try {
-        const result = await pointServices.updateApplication(req.file, req.body, req.params.id);    
+        const result = await roleService.updateRole(req.body, req.params.id);    
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -21,7 +20,7 @@ const update = async (req, res) => {
 
 const getOne = async (req, res) => {
     try {
-        const result = await pointServices.getOne(req.params.id);
+        const result = await roleService.getOne(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -30,7 +29,7 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await pointServices.getAll();
+        const result = await roleService.getAll();
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -39,7 +38,7 @@ const getAll = async (req, res) => {
 
 const deleteOne = async (req, res) => {
     try {
-        const result = await pointServices.deleteApplication(req.params.id);
+        const result = await roleService.deleteRole(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -47,9 +46,9 @@ const deleteOne = async (req, res) => {
 }
 
 module.exports = {
-    addApplication,
+    addRole,
     getAll,
     getOne,
-    update,
+    updateRole,
     deleteOne
 }

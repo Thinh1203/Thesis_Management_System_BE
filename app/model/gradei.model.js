@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
 
-    const PointI  = sequelize.define('pointI', {
+    const GradeI  = sequelize.define('gradeis', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         },
 
         status: {
-            type: DataTypes.STRING,
-            allowNull: true,
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
         },
-        
-        created_at: {
+
+        createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
@@ -28,6 +28,6 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,
     });
 
-    return PointI;
+    return GradeI;
 }
 

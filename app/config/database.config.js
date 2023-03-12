@@ -8,10 +8,15 @@ const sequelize = new Sequelize(
     process.env.PASSWORD, {
     host: process.env.HOST,
     dialect: 'mysql',
-    operatorsAliases: false,
     logging: false,
     timezone: '+07:00',
-
+    define: {
+        timestamps: true,
+        underscored: true,
+        freezeTableName: true,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_general_ci'
+    },
     pool: {
         max: 10,
         min: 0,
@@ -25,42 +30,58 @@ const sequelize = new Sequelize(
     db.Sequelize = Sequelize;
     db.sequelize = sequelize;
     
-    db.users = require('../model/user.model')(sequelize, DataTypes);
     db.councils = require('../model/council.model')(sequelize, DataTypes);
-    
-    db.notificationdetails = require('../model/notificationdetail.model')(sequelize, DataTypes);
+    db.councilDetails = require('../model/councildetail.model')(sequelize, DataTypes);
+    db.departments = require('../model/department.model')(sequelize, DataTypes);
+    db.gradeIs = require('../model/gradei.model')(sequelize, DataTypes);
     db.notification = require('../model/notification.model')(sequelize, DataTypes);
-    db.pointi = require('../model/pointi.model')(sequelize, DataTypes);
-    db.results = require('../model/result.model')(sequelize, DataTypes);
-    db.schoolyears = require('../model/schoolyear.model')(sequelize, DataTypes);
+    db.notificationDetails = require('../model/notificationdetail.model')(sequelize, DataTypes);
+    db.roles = require('../model/role.model')(sequelize, DataTypes);
+    db.schoolYears = require('../model/schoolyear.model')(sequelize, DataTypes);
+    db.theses = require('../model/theses.model')(sequelize, DataTypes);
     db.topics = require('../model/topic.model')(sequelize, DataTypes);    
+    db.users = require('../model/user.model')(sequelize, DataTypes);
     
-    // One-To-One
-    db.schoolyears.hasOne(db.topics);
-    db.topics.belongsTo(db.schoolyears);
-    
-    db.topics.hasOne(db.results);
-    db.results.belongsTo(db.topics);
+    // ----- One-To-One ----- // 
+     
+    db.roles.hasOne(db.users);
+    db.users.belongsTo(db.roles); 
 
-    db.users.hasOne(db.pointi);
-    db.pointi.belongsTo(db.users);
+    db.topics.hasOne(db.theses);
+    db.theses.belongsTo(db.topics);  
 
-    db.users.hasOne(db.topics);
-    db.topics.belongsTo(db.users);
+    // ----- One-To-Many ----- //
 
-    // One-To-Many
-    
-    
-    db.councils.hasMany(db.topics);
-    db.topics.belongsTo(db.councils);
+    db.departments.hasMany(db.theses);
+    db.theses.belongsTo(db.departments);
 
-    // Many-To-Many
+    db.departments.hasMany(db.topics);
+    db.topics.belongsTo(db.departments);
 
-    db.users.belongsToMany(db.notification,  { as: 'user_notice',through: db.notificationdetails});
-    db.notification.belongsToMany(db.users, { as: 'notification_detail',through: db.notificationdetails});
+    db.departments.hasMany(db.users);
+    db.users.belongsTo(db.departments);
+
+    db.gradeIs.hasMany(db.users);
+    db.users.belongsTo(db.gradeIs);
 
 
+    db.users.hasMany(db.notificationDetails);
+    db.notificationDetails.belongsTo(db.users);
 
+    db.notification.hasMany(db.notificationDetails);
+    db.notificationDetails.belongsTo(db.notification);
+
+    db.users.hasMany(db.councilDetails);
+    db.councilDetails.belongsTo(db.users);
+
+    db.councils.hasMany(db.councilDetails);
+    db.councilDetails.belongsTo(db.councils);
+
+    db.schoolYears.hasMany(db.councils);
+    db.councils.belongsTo(db.schoolYears);
+
+    db.schoolYears.hasMany(db.theses);
+    db.theses.belongsTo(db.schoolYears);
 
     db.sequelize.sync({force: false})
     .then(() => {
