@@ -4,7 +4,7 @@ const now = new Date();
 now.toLocaleString('vn-VI', { timeZone: 'Asia/Ho_Chi_Minh' });
 let imageStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'upload/images/');
+        cb(null, 'upload/csv/');
     },
     filename: function(req, file, cb) {
         cb(null, `${now.getDate()}_${now.getHours()}_${now.getMinutes()}-${file.originalname}`);
@@ -12,7 +12,7 @@ let imageStorage = multer.diskStorage({
 });
 
 let imageValidate =  function fileFilter(req, file, cb) {
-    if (file.mimetype.split('/')[1] === 'png' || file.mimetype.split('/')[1] === 'jpg' || file.mimetype.split('/')[1] === 'jpeg' ){
+    if (file.mimetype.split('/')[1] === 'csv'){
         cb(null, true);
     } else {
         cb(new Error("Not image"),false);
@@ -30,17 +30,17 @@ let fileStorage = multer.diskStorage({
 
 let imageSingleValidate =  function fileFilter(req, file, cb) {
     if (file.mimetype.split('/')[1] === 'docx' || file.mimetype.split('/')[1] === 'pdf'){
-        cb(null, true);
+        cb(null, req.user);
     } else {
         cb(new Error("Not image"),false);
     }
 }
 
-let upload = multer({ storage: imageStorage, fileFilter: imageValidate});
+let uploadCSV = multer({ storage: imageStorage, fileFilter: imageValidate});
 
 let uploadFile = multer({ storage: fileStorage, fileFilter: imageSingleValidate});
 
 module.exports = {
-    upload,
+    uploadCSV,
     uploadFile
 }

@@ -36,6 +36,7 @@ const requireAdmin = (req, res, next) => {
 
 const requireUser = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
+    
         if (err) {
             return res.status(401).json({ message: 'Authentication failed.' });
         }

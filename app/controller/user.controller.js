@@ -3,7 +3,7 @@ const userServices = require('../services/user.service');
 
 const addUser = async (req, res) => {
     try {
-        const result = await userServices.addUser(req.body);
+        const result = await userServices.addUser(req.body, req.file);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

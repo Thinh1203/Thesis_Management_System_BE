@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const gradeController = require('../controller/gradei.controller');
+const user = require('../middleware/passport');
+const passport = require('passport');
+const { uploadFile } = require('../middleware/upload');
+router.post('/create',passport.authenticate('jwt', {session: false}),user.requireUser,uploadFile.single('file'), gradeController.create);
+router.put('/updateOne/:id', gradeController.updateOne);
+router.get('/getOne/:id', gradeController.getOne);
+router.get('/getAll', gradeController.getAll);
+router.delete('/deleteOne/:id',gradeController.deleteOne);
+module.exports = router;

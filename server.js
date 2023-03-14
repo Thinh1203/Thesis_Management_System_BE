@@ -14,6 +14,7 @@ const theses = require('./app/routes/theses.route');
 const topic = require('./app/routes/topic.route');
 const role = require('./app/routes/role.route');
 const department = require('./app/routes/department.route');
+const grade = require("./app/routes/gradei.route");
 
 app.use(cors());
 
@@ -32,6 +33,7 @@ app.use('/api/schoolYear',year);
 app.use('/api/theses',theses);
 app.use('/api/topic',topic);
 app.use('/api/department',department);
+app.use('/api/grade',grade);
 
 db.sequelize.authenticate()
     .then(() => {

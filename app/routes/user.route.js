@@ -3,8 +3,9 @@ const router = express.Router();
 const userController = require('../controller/user.controller');
 const user = require('../middleware/passport');
 const passport = require('passport');
+const { uploadCSV } = require('../middleware/upload');
 
-router.post('/addUser', userController.addUser);
+router.post('/addUser', uploadCSV.single('csv'), userController.addUser);
 router.patch('/updateUser/:id' ,userController.updateUser);
 router.get('/getOne/:id',userController.getOne);
 router.get('/getAll',userController.getAll);

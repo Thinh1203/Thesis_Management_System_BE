@@ -2,13 +2,48 @@ const db = require('../config/database.config');
 const {BadRequestError} = require('../utils/error');
 const bcrypt = require('bcryptjs');
 const validation = require('../utils/validation');
+let csv = require('csvtojson');
+const { sendMail } = require('../middleware/sendmail');
+const { generatePassword } = require('../utils/randomPassword');
+const dotenv = require('dotenv');
+dotenv.config();
 
+const addUser = async (data, file) => {
+    if(file) {
+        const userData = [];
+        const results = await csv().fromFile(file.path);
+        for (const element of results) {
+          try {
+            let randomPassword = generatePassword(); 
+            const hashPassword = await bcrypt.hash(randomPassword, 8);
+            const user = await db.users.create({
+              account: element.Code,
+              password: hashPassword,
+              fullName: element.Name,
+              code: element.Code,
+              email: element.Email,
+              address: element.Address,
+              numberPhone: element.Phone,
+              gender: element.Gender,
+              roleId: data.roleId,
+              departmentId: data.departmentId,
+            });
+            userData.push(user);
+            const subject = 'Tài khoản đăng nhập hệ thống!';
+            const html = `<p>Account: ${user.account} </p> </br> <p> Password: ${randomPassword} </p>`;
+            sendMail(user.email, subject, html);
+          } catch (error) {  
+                return error;
+          }
+        }
+        return userData;
+    }
 
-const addUser = async (data) => {
-    const user = await db.users.findOne({ where: { account: data.account }});
+    const user = await db.users.findOne({ where: { account: data.code }});
     if(user) {
         return BadRequestError(400,'Account already exists!');
     }
+    
     if(!validation.checkPhoneNumber(data.numberPhone)) {
         return BadRequestError(400, 'Phone number is not valid');
     }
@@ -23,10 +58,11 @@ const addUser = async (data) => {
     if(!data.departmentId) {
         return BadRequestError(400,'department is not empty!');
     }
-
-    const hashPassword = await bcrypt.hash(data.password,8); 
+    
+    let randomPassword = generatePassword(); 
+    const hashPassword = await bcrypt.hash(randomPassword, 8);
     const result = await db.users.create({
-        account: data.account,
+        account: data.code,
         password: hashPassword,
         fullName: data.fullName,
         code: data.code,
@@ -37,6 +73,9 @@ const addUser = async (data) => {
         departmentId: data.departmentId,
         roleId: data.roleId
     });
+    const subject = 'Tài khoản đăng nhập hệ thống!';
+    const html = `<p>Account: ${result.account} </p> </br> <p> Password: ${randomPassword} </p>`;
+    sendMail(result.email, subject, html);
 
     return result;
 }
