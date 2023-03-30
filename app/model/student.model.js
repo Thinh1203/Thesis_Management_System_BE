@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     
-    const User  = sequelize.define('users', {
+    const Student  = sequelize.define('students', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -22,12 +22,6 @@ module.exports = (sequelize, DataTypes) => {
         fullName: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-
-        code: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue:'',
         },
 
         email: {
@@ -52,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         },     
     });
     
-    return User;
+    return Student;
 }
 
 

@@ -5,9 +5,9 @@ const user = require('../middleware/passport');
 const passport = require('passport');
 const { uploadFile } = require('../middleware/upload');
 
-router.post('/createCouncil', councilController.createCouncil);
-router.patch('/updateCouncil/:id', councilController.updateCouncil);
+router.post('/createCouncil',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.createCouncil);
+router.patch('/updateCouncil/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.updateCouncil);
 router.get('/getOne/:id', councilController.getOne);
 router.get('/getAll', councilController.getAll);
-router.delete('/deleteOne/:id',councilController.deleteOne);
+router.delete('/deleteOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.deleteOne);
 module.exports = router;

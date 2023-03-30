@@ -2,7 +2,7 @@ const gradeService = require('../services/gradei.service');
 
 const create = async (req, res) => {
     try {
-        const result = await gradeService.create(req.user,req.file);
+        const result = await gradeService.create(req.user, req.file);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -29,7 +29,8 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await gradeService.getAll();
+
+        const result = await gradeService.getAll(req.user);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

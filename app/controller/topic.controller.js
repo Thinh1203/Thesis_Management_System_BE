@@ -2,7 +2,7 @@ const topicService = require('../services/topic.service');
 
 const addTopic = async (req, res) => {
     try {
-        const result = await topicService.addTopic(req.body);
+        const result = await topicService.addTopic(req.body, req.file);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

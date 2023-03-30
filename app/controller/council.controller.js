@@ -2,7 +2,6 @@ const councilService = require('../services/council.service');
 
 const createCouncil = async (req, res) => {
     try {
-        //console.log(req.body)
         const result = await councilService.createCouncil(req.body);
         return res.json(result);
     } catch(error) {

@@ -1,18 +1,17 @@
-const userServices = require('../services/user.service');
+const teacherService = require('../services/teacher.service');
 
-
-const addUser = async (req, res) => {
+const addTeacher = async (req, res) => {
     try {
-        const result = await userServices.addUser(req.body, req.file);
+        const result = await teacherService.addTeacher(req.body, req.file);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const updateUser = async (req, res) => {
+const updateTeacher = async (req, res) => {
     try { 
-        const result = await userServices.updateUser(req.body,req.params.id);    
+        const result = await teacherService.updateTeacher(req.body,req.params.id);    
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -21,7 +20,7 @@ const updateUser = async (req, res) => {
 
 const getOne = async (req, res) => {
     try {
-        const result = await userServices.getOne(req.params.id);
+        const result = await teacherService.getOne(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -30,17 +29,16 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        // console.log(res.locals.user.id);
-        const result = await userServices.getAll();
+        const result = await teacherService.getAll(req.user);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
 
-const deleteUser = async (req, res) => {
+const deleteTeacher = async (req, res) => {
     try {
-        const result = await userServices.deleteUser(req.params.id);
+        const result = await teacherService.deleteTeacher(req.params.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -49,17 +47,19 @@ const deleteUser = async (req, res) => {
 
 const updatePassword = async (req, res) => {
     try {
-        const result = await userServices.updatePassword(req.params.id, req.body);
+        const result = await teacherService.updatePassword(req.params.id, req.body);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
     }
 }
+
+
 module.exports = {
-    addUser,
+    addTeacher,
     getAll,
     getOne,
-    updateUser,
-    deleteUser,
+    updateTeacher,
+    deleteTeacher,
     updatePassword
 }

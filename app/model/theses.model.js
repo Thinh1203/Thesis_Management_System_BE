@@ -29,15 +29,12 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
 
-        student: {
-            type: DataTypes.STRING,
-            allowNull: false
+        statusFile: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         },
 
-        lecturer: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
 
         score: {
             type: DataTypes.DOUBLE,

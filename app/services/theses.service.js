@@ -1,20 +1,63 @@
 const db = require('../config/database.config');
 const {BadRequestError} = require('../utils/error');
+const { sendMail } = require('../middleware/sendmail');
 
 const addTheses = async (data) => {  
-    if(!data.code || !data.startDate || !data.endDate || !data.student || !data.lecturer) {
+    if(!data.code || !data.startDate || !data.endDate || !data.schoolYearId || !data.councilId || !data.topicId || !data.studentId || !data.lecturerId) {
         return BadRequestError(400, 'Data is not empty!');
     }
+    const student = await db.students.findOne({ where: { id: data.studentId}});    
     const result = await db.theses.create({
         code: data.code,
         startDate: data.startDate,
         endDate: data.endDate,
-        student: data.student,
-        lecturer: data.lecturer,
         topicId: data.topicId,
-        departmentId: data.departmentId,
-        shoolYearId: data.schoolYearId
+        departmentId: student.departmentId,
+        shoolYearId: data.schoolYearId,
+        councilId: data.councilId,
+        studentId: data.studentId,
+        teacherId: data.lecturerId
     }); 
+    const lecturer = await db.teachers.findOne({ where: { id: result.teacherId }});
+    const council = await db.councils.findOne({
+        include: [
+            {
+                model: db.councilDetails,
+                attributes: { exclude: ['id','councilId']}
+            }, {
+                model: db.schoolYears,
+                attributes: { exclude: ['id']},
+            }
+        ], where: { id: result.councilId }
+    });
+
+    const subject = `Bạn đã được thêm vào hội đồng ${council.code}`;
+    let html = `<p>Thời gian hội đồng diễn ra từ <b>${council.timeStart}</b> đến <b>${council.timeEnd}</b> <b>${council.startDate}</b></p>
+    <h3>Danh sách thành viên hội đồng:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Vị trí</th>
+                <th>Tên</th>
+            </tr>
+        </thead>
+        <tbody>`;
+            for(let i = 0; i < council.councildetails.length; i++) {
+                const findUser = await db.teachers.findOne({ where: { id: council.councildetails[i].teacherId }});
+                html += `
+            <tr>
+                <td>${council.councildetails[i].position}</td>
+                <td>${findUser.fullName}</td>
+            </tr>
+            `;
+            }
+            html += `
+                    </tbody>
+                </table>
+            `;
+    
+     sendMail(student.email, subject, html);
+     sendMail(lecturer.email, subject, html);
     return result;
 }
 
@@ -34,12 +77,12 @@ const getOne = async (id) => {
         return BadRequestError(400, 'Theses not found!');
     }
     const result = await db.theses.findOne({
-        attributes: {exclude: ['topicId', 'departmentId', 'schoolYearId']},
+        attributes: {exclude: ['topicId', 'departmentId', 'shoolYearId', 'councilId', 'studentId', 'lecturerId']},
     
         include: [
             { 
                 model: db.topics,
-                attributes: { exclude: ['id']}
+                attributes: { exclude: ['id','departmentId']}
             },
             {
                 model: db.departments,
@@ -48,7 +91,15 @@ const getOne = async (id) => {
             {
                 model: db.schoolYears,
                 attributes: { exclude: ['id']}
-            }
+            },
+            {
+                model: db.councils,
+                attributes: { exclude: ['id','shoolYearId']}
+            },
+            {
+                model: db.users,
+                attributes: { exclude: ['id']},
+            },
             ],
         where: { id: id }
     });
@@ -85,7 +136,9 @@ const deleteTheses = async (id) => {
 }
 
 const uploadFile = async (file, id) => {
+ 
     const theses = await db.theses.findOne( { where: {id:id}} );
+ 
     if(!theses) {
         return BadRequestError(400, 'Theses not found!');
     }
@@ -96,6 +149,25 @@ const uploadFile = async (file, id) => {
     return (result) ? ({message: 'Successfully'}) : ({message: 'error'});
 }
 
+const transcript = async (data, id, user) => {
+    const teacherId = await db.teachers.findOne({ where: { id: user.id }});
+    const result = await db.transcripts.create({
+       score: data.score,
+       teacherId: teacherId.id,
+       thesesId: id  
+    });
+
+    const updateScore = await db.transcripts.findOne({ where: { thesesId: id }});
+    if (updateScore.length == 3) {
+        let totalScore = 0;
+        for (let i = 0; i < 3; i++) {
+            totalScore += updateScore[i].score; 
+        }
+        sum = totalScore / 3;
+        const updateScoreThese = await db.theses.update({score: sum, where: {id: id}});
+    } 
+    return result;
+}
 
 module.exports = {
     addTheses,
@@ -103,5 +175,8 @@ module.exports = {
     getOne,
     updateTheses,
     deleteTheses,
-    uploadFile
+    uploadFile,
+    transcript
 }
+
+

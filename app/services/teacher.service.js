@@ -5,10 +5,10 @@ const validation = require('../utils/validation');
 let csv = require('csvtojson');
 const { sendMail } = require('../middleware/sendmail');
 const { generatePassword } = require('../utils/randomPassword');
-const dotenv = require('dotenv');
-dotenv.config();
+const { Op } = require('sequelize');
 
-const addUser = async (data, file) => {
+
+const addTeacher = async (data, file) => {
     if(file) {
         const userData = [];
         const results = await csv().fromFile(file.path);
@@ -16,11 +16,10 @@ const addUser = async (data, file) => {
           try {
             let randomPassword = generatePassword(); 
             const hashPassword = await bcrypt.hash(randomPassword, 8);
-            const user = await db.users.create({
+            const user = await db.teachers.create({
               account: element.Code,
               password: hashPassword,
               fullName: element.Name,
-              code: element.Code,
               email: element.Email,
               address: element.Address,
               numberPhone: element.Phone,
@@ -39,7 +38,7 @@ const addUser = async (data, file) => {
         return userData;
     }
 
-    const user = await db.users.findOne({ where: { account: data.code }});
+    const user = await db.teachers.findOne({ where: { account: data.code }});
     if(user) {
         return BadRequestError(400,'Account already exists!');
     }
@@ -61,11 +60,10 @@ const addUser = async (data, file) => {
     
     let randomPassword = generatePassword(); 
     const hashPassword = await bcrypt.hash(randomPassword, 8);
-    const result = await db.users.create({
+    const result = await db.teachers.create({
         account: data.code,
         password: hashPassword,
         fullName: data.fullName,
-        code: data.code,
         numberPhone: data.numberPhone,
         email: data.email,
         address: data.address,
@@ -80,8 +78,8 @@ const addUser = async (data, file) => {
     return result;
 }
 
-const updateUser = async (data, id) => {
-   const user = await db.users.findByPk(id);
+const updateTeacher = async (data, id) => {
+   const user = await db.teachers.findByPk(id);
     if(!user) return BadRequestError(400,'user not found!');
 
     if(data.phone) {
@@ -96,35 +94,58 @@ const updateUser = async (data, id) => {
         }
     }
 
-    const result = await db.users.update(data, { where: { id:id }});
+    const result = await db.teachers.update(data, { where: { id:id }});
     return (result[0]) ? ({message: 'Successfully'}) : ({message: 'error'});
 
 }
 
-const getAll = async () => {
-    const user = await db.users.findAll({
-        attributes: { exclude: ['departmentId', 'roleId', 'gradeiId', 'password']},
+const getAll = async (user) => {
+    let teachers;
+    if(user.role == 'admin') {
+        teachers = await db.teachers.findAll({
+            attributes: { exclude: ['departmentId', 'roleId', 'password']},
+            include: [
+                {
+                    model: db.departments,
+                    attributes: { exclude: ['id']},
+                    where: { id: user.department }
+                },
+                {
+                    model: db.roles,
+                    attributes: { exclude: ['id']},
+                    where: { code: {  [Op.notIn]: ['TK', 'admin']  }}
+                }
+        ]
+        });
+        return teachers;
+    }
+    teachers = await db.teachers.findAll({
+        attributes: { exclude: ['departmentId', 'roleId', 'password']},
         include: [
             {
                 model: db.departments,
                 attributes: { exclude: ['id']},
+                where: { id: user.department }
             },
             {
                 model: db.roles,
-                attributes: { exclude: ['id']}
+                attributes: { exclude: ['id']},
+                where: { code: { [Op.ne]: 'admin' }}
             }
-    ]
+        ],
+        where: { id: {[Op.ne]: user.id }}
     });
-    return user;
+    return teachers;
 }
 
 const getOne = async (id) => {
-    const user = await db.users.findOne(
+    const user = await db.teachers.findOne(
         {
             attributes: { exclude: ['departmentId', 'roleId', 'gradeiId', 'password']},
             include: [{
                 model: db.departments,
-                attributes: { exclude: ['id']}
+                attributes: { exclude: ['id']},
+
             },
             {
                 model: db.roles,
@@ -138,17 +159,17 @@ const getOne = async (id) => {
     return user;
 }
 
-const deleteUser = async (id) => {
-    const user = await db.users.findByPk(id);
+const deleteTeacher = async (id) => {
+    const user = await db.teachers.findByPk(id);
     if(!user) return BadRequestError(400,'user not found!');
-    const result = await db.users.destroy({ where: { id: id }});
+    const result = await db.teachers.destroy({ where: { id: id }});
 
     return (result) ? ({message: 'Successfully'}) : ({message: 'error'});
 }
 
 const updatePassword = async (id, data) => {
 
-   const user = await db.users.findOne({ where: { id: id }});
+   const user = await db.teachers.findOne({ where: { id: id }});
     if(!bcrypt.compareSync(data.password, user.password))
         return BadRequestError(400,'Password not match!');
 
@@ -157,15 +178,16 @@ const updatePassword = async (id, data) => {
 
      const newPass = await bcrypt.hash(data.newPassword, 8); 
 
-    const result = await db.users.update({ password: newPass}, {where: { id: id }});
+    const result = await db.teachers.update({ password: newPass}, {where: { id: id }});
     return (result) ? ({message: 'Successfully'}) : ({message: 'error'});
 }
 
+
 module.exports = {
-    addUser,
-    getAll,
+    addTeacher,
+    updateTeacher,
     getOne,
-    updateUser,
-    deleteUser,
+    getAll,
+    deleteTeacher,
     updatePassword
 }

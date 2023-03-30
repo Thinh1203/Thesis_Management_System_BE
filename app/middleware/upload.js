@@ -30,7 +30,8 @@ let fileStorage = multer.diskStorage({
 
 let imageSingleValidate =  function fileFilter(req, file, cb) {
     if (file.mimetype.split('/')[1] === 'docx' || file.mimetype.split('/')[1] === 'pdf'){
-        cb(null, req.user);
+        cb(null, true);
+
     } else {
         cb(new Error("Not image"),false);
     }

@@ -1,11 +1,28 @@
 const db = require('../config/database.config');
 const {BadRequestError} = require('../utils/error');
+let csv = require('csvtojson');
 
-const addTopic = async (data) => {  
-    const result = await db.topics.create({
+const addTopic = async (data, file) => {  
+    let result;
+    let listTopic = [];
+    if(file) {
+        const topic = await csv().fromFile(file.path);
+        for (const element of topic) {
+            try{
+                result = await db.topics.create({
+                    VietnameseName: element.VietnameseTopicName,
+                    EnglishName: element.EnglishTopicName,
+                });
+                listTopic.push(result);
+            } catch(err){
+                return err;
+            }
+        }
+        return listTopic;
+    }
+    result = await db.topics.create({
         VietnameseName: data.VietnameseName,
         EnglishName: data.EnglishName,
-        departmentId: data.departmentId
     }); 
     return result;
 }
@@ -27,23 +44,13 @@ const getOne = async (id) => {
         return BadRequestError(400, 'Topic not found!');
     }
     const result = await db.topics.findOne({
-        attributes: { exclude: ['departmentId']},
-        include: {
-            model: db.departments,
-            attributes: { exclude: ['id']}
-        },
         where: { id: id }
     });
     return result;
 }
 
 const getAll = async () => {
-    const result = await db.topics.findAll({
-        include: {
-            model: db.departments,
-            attributes: { exclude: ['id']}
-        }
-    });
+    const result = await db.topics.findAll();
     return result;
 }
 

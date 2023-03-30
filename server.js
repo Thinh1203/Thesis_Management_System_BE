@@ -7,7 +7,8 @@ const app = express();
 dotenv.config();
 
 
-const user = require('./app/routes/user.route');
+const student = require('./app/routes/student.route');
+const teacher = require('./app/routes/teacher.route');
 const auth = require('./app/routes/auth.route');
 const year = require('./app/routes/schoolyear.route');
 const theses = require('./app/routes/theses.route');
@@ -15,6 +16,7 @@ const topic = require('./app/routes/topic.route');
 const role = require('./app/routes/role.route');
 const department = require('./app/routes/department.route');
 const grade = require("./app/routes/gradei.route");
+const council = require("./app/routes/council.route");
 
 app.use(cors());
 
@@ -26,7 +28,8 @@ app.get('/', (req, res) => {
     res.json({ message: 'Well come to my app' });
 });
 
-app.use('/api/user', user);
+app.use('/api/student', student);
+app.use('/api/teacher', teacher);
 app.use('/api/auth',auth);
 app.use('/api/role',role);
 app.use('/api/schoolYear',year);
@@ -34,6 +37,7 @@ app.use('/api/theses',theses);
 app.use('/api/topic',topic);
 app.use('/api/department',department);
 app.use('/api/grade',grade);
+app.use('/api/council',council);
 
 db.sequelize.authenticate()
     .then(() => {

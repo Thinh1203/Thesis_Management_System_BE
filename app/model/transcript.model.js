@@ -1,24 +1,19 @@
 module.exports = (sequelize, DataTypes) => {
-
-    const NotificationDetail  = sequelize.define('notificationDetails', {
+    const Transcript  = sequelize.define('transcripts', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
         },
-
-        status: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        }
         
+        score: {
+            type: DataTypes.DOUBLE,
+            allowNull: false,
+        }
     }, {
         timestamps: false,
     });
 
-    return NotificationDetail;
+    return Transcript;
 }
-    
-

@@ -47,7 +47,7 @@ const deleteTheses = async (req, res) => {
 }
 
 const uploadFile = async (req, res) => {
-    try{
+    try {
         const result = await thesesService.uploadFile(req.file, req.params.id);
         return res.json(result);
     } catch(error) {
@@ -55,11 +55,20 @@ const uploadFile = async (req, res) => {
     }
 }
 
+const transcript = async (req, res) => {
+    try {
+        const result = await thesesService.transcript(req.body, req.params.id, req.user);
+        return res.json(result);
+    } catch(error) {
+        return res.status(500).json({ message: error });
+    }
+}
 module.exports = {
     addTheses,
     getAll,
     getOne,
     updateTheses,
     deleteTheses,
-    uploadFile
+    uploadFile,
+    transcript
 }

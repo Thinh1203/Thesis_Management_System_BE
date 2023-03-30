@@ -9,7 +9,11 @@ passport.use(new StrategyJwt({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     }, (payload, done) => {
         try {
-            const user = db.users.findOne({ where: { id: payload.id }});
+            let user;
+            user = db.teachers.findOne({ where: { id: payload.id }});
+            if(!user) {
+                user = db.students.findOne({ where: { id: payload.id }});
+            }
             if(!user) return done(error, false);
             return done(null, payload);
         } catch(error) {
@@ -20,6 +24,7 @@ passport.use(new StrategyJwt({
 
 const requireAdmin = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
+
         if (err) {
             return res.status(401).json({ message: 'Authentication failed.' });
         }
@@ -27,6 +32,23 @@ const requireAdmin = (req, res, next) => {
             return res.status(401).json({ message: 'User not found.' });
         }
         if (user.role == 'admin' || user.role == 'TK') {
+            req.user = user;  
+            return next();
+        }
+        return res.status(403).json({ message: 'Admin access required.' });
+    })(req, res, next);
+}
+
+const requireTk = (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+
+        if (err) {
+            return res.status(401).json({ message: 'Authentication failed.' });
+        }
+        if (!user) {
+            return res.status(401).json({ message: 'User not found.' });
+        }
+        if (user.role == 'TK') {
             req.user = user;  
             return next();
         }
@@ -50,5 +72,6 @@ const requireUser = (req, res, next) => {
 
 module.exports = {
     requireAdmin,
-    requireUser
+    requireUser,
+    requireTk
 }
