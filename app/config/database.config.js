@@ -33,10 +33,8 @@ const sequelize = new Sequelize(
     db.teachers = require('../model/teacher.model')(sequelize, DataTypes);
     db.councils = require('../model/council.model')(sequelize, DataTypes);
     db.councilDetails = require('../model/councildetail.model')(sequelize, DataTypes);
-    db.departments = require('../model/department.model')(sequelize, DataTypes);
     db.gradeIs = require('../model/gradei.model')(sequelize, DataTypes);
-    db.notification = require('../model/notification.model')(sequelize, DataTypes);
-    // db.notificationDetails = require('../model/notificationdetail.model')(sequelize, DataTypes);
+
     db.roles = require('../model/role.model')(sequelize, DataTypes);
     db.schoolYears = require('../model/schoolyear.model')(sequelize, DataTypes);
     db.theses = require('../model/theses.model')(sequelize, DataTypes);
@@ -66,12 +64,6 @@ const sequelize = new Sequelize(
     db.councils.hasMany(db.theses);
     db.theses.belongsTo(db.councils);   
 
-    db.departments.hasMany(db.students);
-    db.students.belongsTo(db.departments);
-
-    db.departments.hasMany(db.teachers);
-    db.teachers.belongsTo(db.departments);
-
     db.gradeIs.hasMany(db.students);
     db.students.belongsTo(db.gradeIs);
 
@@ -92,11 +84,6 @@ const sequelize = new Sequelize(
     db.teachers.belongsToMany(db.theses, { through: 'transcripts'});
     db.theses.belongsToMany(db.teachers, { through: 'transcripts'});
 
-    // db.students.belongsToMany(db.notification, { through: 'Student_Notification' });
-    // db.notification.belongsToMany(db.students, { through: 'Student_Notification' });
-
-    // db.teachers.belongsToMany(db.notification, { through: 'Teacher_Notification' });
-    // db.notification.belongsToMany(db.teachers, { through: 'Teacher_Notification' });
 
     db.sequelize.sync({alter: true})
     .then(() => {

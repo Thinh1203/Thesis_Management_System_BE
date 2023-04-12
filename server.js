@@ -14,7 +14,6 @@ const year = require('./app/routes/schoolyear.route');
 const theses = require('./app/routes/theses.route');
 const topic = require('./app/routes/topic.route');
 const role = require('./app/routes/role.route');
-const department = require('./app/routes/department.route');
 const grade = require("./app/routes/gradei.route");
 const council = require("./app/routes/council.route");
 
@@ -35,7 +34,6 @@ app.use('/api/role',role);
 app.use('/api/schoolYear',year);
 app.use('/api/theses',theses);
 app.use('/api/topic',topic);
-app.use('/api/department',department);
 app.use('/api/grade',grade);
 app.use('/api/council',council);
 

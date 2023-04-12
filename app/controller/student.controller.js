@@ -47,7 +47,7 @@ const deleteStudent = async (req, res) => {
 
 const updatePassword = async (req, res) => {
     try {
-        const result = await studentService.updatePassword(req.params.id, req.body);
+        const result = await studentService.updatePassword(req.user.id, req.body);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

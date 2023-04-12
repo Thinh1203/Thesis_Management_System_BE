@@ -10,9 +10,11 @@ const login = async (req, res) => {
         checkUser = await db.students.findOne( { where: { account: account }});
     }
     if(!checkUser) 
-        return res.status(400).json({ message: 'User is not found!'});
+        return res.status(404).json({ message: 'Tài khoản không tồn tại!'});
+    if(!checkUser.status)
+        return res.status(400).json({message: 'Tài khoản đã bị khóa'});
     if(!bcrypt.compareSync(password, checkUser.password)) 
-    return res.status(400).json({ message: 'Password is not match!'});
+    return res.status(403).json({ message: 'Mật khẩu không đúng!'});
 
     const userRole = await db.roles.findOne({ where: { id: checkUser.roleId }});
 

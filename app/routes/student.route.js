@@ -10,7 +10,7 @@ router.patch('/updateStudent/:id' ,userController.updateStudent);
 router.get('/getOne/:id',userController.getOne);
 router.get('/getAll',userController.getAll);
 router.delete('/deleteOne/:id',userController.deleteStudent);
-router.patch('/changePassword/:id', userController.updatePassword);
+router.patch('/changePassword',passport.authenticate('jwt', {session: false}), userController.updatePassword);
 
 module.exports = router;
 //passport.authenticate('jwt', {session: false}),user.requireAdmin

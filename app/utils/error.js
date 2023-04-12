@@ -1,5 +1,5 @@
 const BadRequestError = (statusCode, message) => {
-    return ({ statusCode, error: message});
+    return ({ statusCode, message: message});
 }
 
 module.exports = {

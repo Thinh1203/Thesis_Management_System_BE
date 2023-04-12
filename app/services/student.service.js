@@ -148,16 +148,16 @@ const deleteStudent = async (id) => {
 const updatePassword = async (id, data) => {
 
    const user = await db.students.findOne({ where: { id: id }});
-    if(!bcrypt.compareSync(data.password, user.password))
-        return BadRequestError(400,'Password not match!');
+    if(!bcrypt.compareSync(data.oldPassword, user.password))
+        return BadRequestError(403,'Mật khẩu cũ không đúng!');
 
     if(data.newPassword != data.confirmPassword)
-        return BadRequestError(400,'New password and confirm password not match!');
+        return BadRequestError(403,'Mật khẩu mới không trùng khớp!');
 
      const newPass = await bcrypt.hash(data.newPassword, 8); 
 
     const result = await db.students.update({ password: newPass}, {where: { id: id }});
-    return (result) ? ({message: 'Successfully'}) : ({message: 'error'});
+    return (result) ? BadRequestError(200,'Đổi mật khẩu thành công!') : BadRequestError(500,'Có lỗi xảy ra!');
 }
 
 

@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         },
 
         timeStart: {
-            type: DataTypes.DATE,
+            type: DataTypes.TIME,
             allowNull: false,
         },
         
