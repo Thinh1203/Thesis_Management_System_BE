@@ -18,7 +18,7 @@ const updateRole = async (data, id) => {
         return new BadRequestError(400,'Role not found!');
     }
     const result = await db.roles.update(data, {where: {id:id}});
-    return (result) ? ({message: 'Update successful'}) : ({message: 'error'});
+    return (result) ? ({statusCode:200, message: 'Cập nhật thành công!'}) : ({message: 'error'});
 }
 
 const getOne = async (id) => {

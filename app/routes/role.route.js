@@ -7,6 +7,6 @@ const passport = require('passport');
 router.post('/addRole', roleController.addRole);
 router.put('/updateRole/:id', roleController.updateRole);
 router.get('/getOne/:id', roleController.getOne);
-router.get('/getAll', roleController.getAll);
+router.get('/getAll',passport.authenticate('jwt', {session: false}), user.requireAdmin , roleController.getAll);
 router.delete('/deleteOne/:id',roleController.deleteOne);
 module.exports = router;

@@ -3,7 +3,17 @@ const teacherService = require('../services/teacher.service');
 const addTeacher = async (req, res) => {
     try {
     
-        const result = await teacherService.addTeacher(req.body, req.file);
+        const result = await teacherService.addTeacher(req.body);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const uploadFile = async (req, res) => {
+    try {
+
+        const result = await teacherService.uploadFile(req.file);
         return res.json(result);
     } catch (error) {
         return res.status(500).json({ message: error });
@@ -77,6 +87,15 @@ const updatePassword = async (req, res) => {
 }
 
 
+const getTotalTeacher = async (req, res) => {
+    try {
+        const result = await teacherService.getTotalTeacher();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addTeacher,
     getAll,
@@ -85,5 +104,7 @@ module.exports = {
     deleteTeacher,
     updatePassword, 
     search,
-    accountStatus
+    accountStatus,
+    uploadFile,
+    getTotalTeacher
 }

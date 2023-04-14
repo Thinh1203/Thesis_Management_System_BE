@@ -2,7 +2,18 @@ const studentService = require('../services/student.service');
 
 const addStudent = async (req, res) => {
     try {
-        const result = await studentService.addStudent(req.body, req.file);
+        
+        const result = await studentService.addStudent(req.body);
+        return res.json(result);
+    } catch(error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const uploadFile = async (req, res) => {
+    try {
+        
+        const result = await studentService.uploadFile(req.file);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -18,6 +29,15 @@ const updateStudent = async (req, res) => {
     }
 }
 
+const accountStatus = async (req, res) => {
+    try {
+        const result = await studentService.accountStatus(req.body.data, req.params.id);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 const getOne = async (req, res) => {
     try {
         const result = await studentService.getOne(req.params.id);
@@ -29,7 +49,8 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await studentService.getAll(req.user);
+        const { page } = req.query;
+        const result = await studentService.getAll(page);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -54,6 +75,23 @@ const updatePassword = async (req, res) => {
     }
 }
 
+const search = async (req, res) => {
+    try {
+        const { q, page } = req.query;
+        const result = await studentService.search(q, page);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+const getTotalStudent = async (req, res) => {
+    try {
+        const result = await studentService.getTotalStudent();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
 
 module.exports = {
     addStudent,
@@ -61,5 +99,9 @@ module.exports = {
     getOne,
     updateStudent,
     deleteStudent,
-    updatePassword
+    updatePassword,
+    accountStatus,
+    uploadFile,
+    search,
+    getTotalStudent
 }

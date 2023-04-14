@@ -8,36 +8,8 @@ const { generatePassword } = require('../utils/randomPassword');
 const { Op } = require('sequelize');
 
 
-const addTeacher = async (data, file) => {
+const addTeacher = async (data) => {
     const role = 3;
-
-    if (file) {
-        const userData = [];
-        const results = await csv().fromFile(file.path);
-        for (const element of results) {
-            try {
-                let randomPassword = generatePassword();
-                const hashPassword = await bcrypt.hash(randomPassword, 8);
-                const user = await db.teachers.create({
-                    account: element.Code,
-                    password: hashPassword,
-                    fullName: element.Name,
-                    email: element.Email,
-                    address: element.Address,
-                    numberPhone: element.Phone,
-                    gender: element.Gender,
-                    roleId: data.role
-                });
-                userData.push(user);
-                const subject = 'Tài khoản đăng nhập hệ thống!';
-                const html = `<p>Account: ${user.account} </p> </br> <p> Password: ${randomPassword} </p>`;
-                sendMail(user.email, subject, html);
-            } catch (error) {
-                return error;
-            }
-        }
-        return {statusCode: 200, message: "Thêm giảng viên thành công!"};
-    }
     const user = await db.teachers.findOne({ where: { account: data.account } });
     if (user) {
         return BadRequestError(400, 'Tài khoản đã tồn tại!');
@@ -66,30 +38,64 @@ const addTeacher = async (data, file) => {
     const html = `<p>Account: ${result.account} </p> </br> <p> Password: ${randomPassword} </p>`;
     sendMail(result.email, subject, html);
 
-    return {statusCode: 200, message: "Thêm giảng viên thành công!"};
+    return result ? ({ statusCode: 200, message: 'Cập nhật thành công!' }) : ({ message: 'error' });
+}
+
+
+const uploadFile = async (file) => {
+    const role = 3;
+    const userData = [];
+    const results = await csv().fromFile(file.path);
+    for (const element of results) {
+        try {
+            const checkUser = await db.teachers.findOne({ where: { account: element.Code } });
+            if (checkUser) {
+                return ({ statusCode: 400, message: 'Tài khoản đã tồn tại!' })
+            }
+            let randomPassword = generatePassword();
+            const hashPassword = await bcrypt.hash(randomPassword, 8);
+            const user = await db.teachers.create({
+                account: element.Code,
+                password: hashPassword,
+                fullName: element.Name,
+                email: element.Email,
+                address: element.Address,
+                numberPhone: element.Phone,
+                gender: element.Gender,
+                roleId: role
+            });
+            userData.push(user);
+            const subject = 'Tài khoản đăng nhập hệ thống!';
+            const html = `<p>Account: ${user.account} </p> </br> <p> Password: ${randomPassword} </p>`;
+            sendMail(user.email, subject, html);
+        } catch (error) {
+            return error;
+        }
+    }
+    return userData ? ({ statusCode: 200, message: 'Cập nhật thành công!' }) : ({ message: 'error' });
 }
 
 const accountStatus = async (status, id) => {
 
     const user = await db.teachers.findByPk(id);
     if (!user) return BadRequestError(400, 'user not found!');
-    const result = await db.teachers.update({status: status}, { where: { id: id } });
+    const result = await db.teachers.update({ status: status }, { where: { id: id } });
     return (result[0]) ? ({ status: 200, message: 'Successfully' }) : ({ message: 'error' });
 }
 
 const updateTeacher = async (data, id) => {
     const user = await db.teachers.findByPk(id);
-    if (!user) return BadRequestError(400, 'user not found!');
+    if (!user) return BadRequestError(400, 'Tài khoản không tồn tại!');
 
     if (data.phone) {
         if (!validation.checkPhoneNumber(data.phone)) {
-            return BadRequestError(400, 'Phone number is not valid');
+            return BadRequestError(400, 'Số điện thoại không hợp lệ');
         }
     }
 
     if (data.email) {
         if (!validation.checkEmail(data.email)) {
-            return BadRequestError(400, 'Email is not valid!');
+            return BadRequestError(400, 'Email không hợp lệ!');
         }
     }
 
@@ -109,7 +115,7 @@ const getAll = async (user, page) => {
                 {
                     model: db.roles,
                     attributes: { exclude: ['id'] },
-                    where: { code: { [Op.notIn]: ['TK', 'admin'] } }
+                    where: { code: { [Op.notIn]: ['admin'] } }
                 }
             ],
             limit: pageSize,
@@ -124,7 +130,7 @@ const getAll = async (user, page) => {
             previousPage, nextPage, lastPage,
             total: count,
             data: rows
-        } : BadRequestError(400, "User not found!");
+        } : BadRequestError(400, 'User not found!');
     }
     const { count, rows } = await db.teachers.findAndCountAll({
         attributes: { exclude: ['roleId', 'password'] },
@@ -132,7 +138,7 @@ const getAll = async (user, page) => {
             {
                 model: db.roles,
                 attributes: { exclude: ['id'] },
-                where: { code: { [Op.ne]: 'admin' } }
+                // where: { code: { [Op.ne]: 'admin' } }
             }
         ],
         where: { id: { [Op.ne]: user.id } },
@@ -147,22 +153,46 @@ const getAll = async (user, page) => {
         previousPage, nextPage, lastPage,
         total: count,
         data: rows
-    } : BadRequestError(400, "User not found!");
+    } : BadRequestError(400, 'User not found!');
+}
+
+
+const search = async (value) => {
+    const results = await db.teachers.findAll({
+        attributes: { exclude: ['roleId', 'password'] },
+        include: [
+            {
+                model: db.roles,
+                attributes: { exclude: ['id'] },
+            }
+        ],
+        where: {
+            [Op.or]: {
+                account: { [Op.like]: `%${value}%`  },
+                fullName: { [Op.like]: `%${value}%`  },
+                address: { [Op.like]: `%${value}%`  },
+            },
+            roleId: {
+                [Op.notIn]: [1, 2]
+            }
+        },
+    });
+    return results;
 }
 
 const getOne = async (id) => {
+
     const user = await db.teachers.findOne(
         {
             attributes: { exclude: ['roleId', 'password'] },
             include: [
                 {
                     model: db.roles,
-                    attributes: { exclude: ['id'] }
                 }
             ],
             where: { id: id }
         }
-    )
+    );
     if (!user) return BadRequestError(400, 'user not found!');
 
     return user;
@@ -190,27 +220,21 @@ const updatePassword = async (id, data) => {
     return (result) ? ({ statusCode: 200, message: 'Đổi mật khẩu thành công!' }) : ({ message: 'error' });
 }
 
-const search = async (value) => {
-    const results = await db.teachers.findAll({
+const getTotalTeacher = async () => {
+    const { count, rows } = await db.teachers.findAndCountAll({
         attributes: { exclude: ['roleId', 'password'] },
         include: [
             {
                 model: db.roles,
                 attributes: { exclude: ['id'] },
+                where: { code: { [Op.ne]: 'admin' } }
             }
         ],
-        where: {
-            [Op.or]: {
-                account: { [Op.regexp]: `(?i)${value}` },
-                fullName: { [Op.regexp]: `(?i)${value}` },
-                address: { [Op.regexp]: `(?i)${value}` },
-            },
-            roleId: {
-                [Op.notIn]: [1,2]
-            }
-        },
     });
-    return results;
+    return rows.length ? {
+        total: count,
+        data: rows
+    } : BadRequestError(400, 'User not found!');
 }
 
 module.exports = {
@@ -221,5 +245,7 @@ module.exports = {
     deleteTeacher,
     updatePassword,
     search,
-    accountStatus
+    accountStatus,
+    uploadFile,
+    getTotalTeacher
 }
