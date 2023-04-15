@@ -166,7 +166,7 @@ const accountStatus = async (status, id) => {
 }
 
 const search = async (value, page) => {
-    const pageSize = 3;
+    const pageSize = 8;
     const offset = (page - 1) * pageSize;
     const currentPage = parseInt(page);
     const {count, rows} = await db.students.findAndCountAll({

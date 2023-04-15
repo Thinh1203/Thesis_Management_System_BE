@@ -13,7 +13,15 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         semester: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
+            allowNul: false
+        },
+        startDate: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        endDate: {
+            type: DataTypes.DATE,
             allowNull: false,
         }
         

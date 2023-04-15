@@ -39,7 +39,7 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await schoolYearService.getAll();
+        const result = await schoolYearService.getAll(req.query.page);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
