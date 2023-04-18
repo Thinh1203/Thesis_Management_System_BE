@@ -138,7 +138,7 @@ const getAll = async (user, page) => {
             {
                 model: db.roles,
                 attributes: { exclude: ['id'] },
-                // where: { code: { [Op.ne]: 'admin' } }
+                where: { code: { [Op.ne]: 'admin' } }
             }
         ],
         where: { id: { [Op.ne]: user.id } },

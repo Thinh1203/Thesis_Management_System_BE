@@ -7,7 +7,12 @@ const { uploadFile } = require('../middleware/upload');
 
 router.post('/createCouncil',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.createCouncil);
 router.patch('/updateCouncil/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.updateCouncil);
-router.get('/getOne/:id', councilController.getOne);
-router.get('/getAll', councilController.getAll);
+router.get('/getOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOne);
+router.get('/getAll',councilController.getAll);
 router.delete('/deleteOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.deleteOne);
+router.get('/getAllSemester',passport.authenticate('jwt', {session: false}), user.requireAdmin,councilController.getAllSemester);
+router.get('/getAllTeacher',passport.authenticate('jwt', {session: false}), user.requireAdmin,councilController.getAllTeacher);
+router.patch('/councilStatus/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.councilStatus);
+router.get('/getOneUpdate/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOneUpdate);
+
 module.exports = router;
