@@ -2,7 +2,6 @@ const thesesService = require('../services/theses.service');
 
 const addTheses = async (req, res) => {
     try {
-   
         const result = await thesesService.addTheses(req.body);
         return res.json(result);
     } catch(error) {
@@ -30,7 +29,8 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await thesesService.getAll();
+        const { page } = req.query;
+        const result = await thesesService.getAll(page);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

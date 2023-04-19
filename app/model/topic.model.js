@@ -6,7 +6,11 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             allowNull: false,
         },
-        
+        code: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+
         VietnameseName: {
             type: DataTypes.STRING,
             allowNull: false,

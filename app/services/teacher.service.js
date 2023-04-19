@@ -72,7 +72,7 @@ const uploadFile = async (file) => {
             return error;
         }
     }
-    return userData ? ({ statusCode: 200, message: 'Cập nhật thành công!' }) : ({ message: 'error' });
+    return userData ? ({ statusCode: 200, message: 'Cập nhật thành công!' }) : ({ statusCode: 400, message: 'Có lỗi xảy ra!' });
 }
 
 const accountStatus = async (status, id) => {
@@ -168,9 +168,9 @@ const search = async (value) => {
         ],
         where: {
             [Op.or]: {
-                account: { [Op.like]: `%${value}%`  },
-                fullName: { [Op.like]: `%${value}%`  },
-                address: { [Op.like]: `%${value}%`  },
+                account: { [Op.like]: `%${value}%` },
+                fullName: { [Op.like]: `%${value}%` },
+                address: { [Op.like]: `%${value}%` },
             },
             roleId: {
                 [Op.notIn]: [1, 2]
@@ -237,6 +237,22 @@ const getTotalTeacher = async () => {
     } : BadRequestError(400, 'User not found!');
 }
 
+
+const getListTeacher = async () => {
+    const result = await db.teachers.findAll({
+        attributes: ['id', 'fullName'],
+        include: [
+            {
+                model: db.roles,
+                attributes: { exclude: ['id'] },
+                where: { code: { [Op.ne]: 'admin' } }
+            }
+        ],
+        order: [['id', 'DESC']],
+    });
+    return result;
+}
+
 module.exports = {
     addTeacher,
     updateTeacher,
@@ -247,5 +263,6 @@ module.exports = {
     search,
     accountStatus,
     uploadFile,
-    getTotalTeacher
+    getTotalTeacher,
+    getListTeacher
 }

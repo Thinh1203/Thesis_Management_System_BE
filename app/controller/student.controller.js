@@ -68,7 +68,7 @@ const deleteStudent = async (req, res) => {
 
 const updatePassword = async (req, res) => {
     try {
-        const result = await studentService.updatePassword(req.user.id, req.body);
+        const result = await studentService.updatePassword(req.params.id, req.body);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -93,6 +93,15 @@ const getTotalStudent = async (req, res) => {
     }
 }
 
+const getListStudent = async (req, res) => {
+    try {
+        const result = await studentService.getListStudent();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addStudent,
     getAll,
@@ -103,5 +112,6 @@ module.exports = {
     accountStatus,
     uploadFile,
     search,
-    getTotalStudent
+    getTotalStudent,
+    getListStudent
 }

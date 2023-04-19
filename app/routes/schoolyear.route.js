@@ -10,4 +10,6 @@ router.patch('/updateYear/:id',passport.authenticate('jwt', {session: false}), u
 router.get('/getOne/:id',passport.authenticate('jwt', {session: false}), user.requireAdmin, schoolYearController.getOne);
 router.get('/getAll',passport.authenticate('jwt', {session: false}), user.requireAdmin,schoolYearController.getAll);
 router.delete('/deleteOne/:id',passport.authenticate('jwt', {session: false}), user.requireAdmin,schoolYearController.deleteOne);
+router.get('/getListSemester',passport.authenticate('jwt', {session: false}), user.requireAdmin ,schoolYearController.getAllSemester);
+
 module.exports = router;

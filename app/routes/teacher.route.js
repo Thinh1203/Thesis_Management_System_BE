@@ -15,5 +15,6 @@ router.patch('/changePassword/:id',passport.authenticate('jwt', {session: false}
 router.get('/search',passport.authenticate('jwt', {session: false}), user.requireAdmin , userController.search);
 router.delete('/deleteOne/:id', passport.authenticate('jwt', {session: false}), user.requireAdmin , userController.deleteTeacher);
 router.get('/getTotalTeacher', passport.authenticate('jwt', {session: false}), user.requireAdmin , userController.getTotalTeacher);
+router.get('/getListTeacher',passport.authenticate('jwt', {session: false}), user.requireAdmin ,userController.getListTeacher);
 
 module.exports = router;

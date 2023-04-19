@@ -46,10 +46,20 @@ const getAll = async (req, res) => {
     }
 }
 
+const getAllSemester = async (req, res) => {
+    try {
+        const result = await schoolYearService.getAllSemester();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addSchoolYear,
     updateSchoolYear,
     deleteOne,
     getOne,
-    getAll
+    getAll,
+    getAllSemester
 }

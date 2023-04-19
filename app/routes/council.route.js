@@ -9,6 +9,7 @@ router.post('/createCouncil',passport.authenticate('jwt', {session: false}),user
 router.patch('/updateCouncil/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.updateCouncil);
 router.get('/getOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOne);
 router.get('/getAll',councilController.getAll);
+router.get('/getListCouncil',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.getListCouncil);
 router.delete('/deleteOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.deleteOne);
 router.get('/getAllSemester',passport.authenticate('jwt', {session: false}), user.requireAdmin,councilController.getAllSemester);
 router.get('/getAllTeacher',passport.authenticate('jwt', {session: false}), user.requireAdmin,councilController.getAllTeacher);

@@ -53,7 +53,8 @@ const getAll = async (page) => {
     const currentPage = parseInt(page);
     const { count, rows } = await db.schoolYears.findAndCountAll({
         limit: pageSize,
-        offset: offset
+        offset: offset,
+        order: [['id', 'DESC']],
     });
 
     const lastPage = Math.ceil(count / pageSize);
@@ -83,10 +84,18 @@ const getAll = async (page) => {
 }
 
 
+const getAllSemester = async () => {
+    const result = await db.schoolYears.findAll({
+        order: [['id', 'DESC']],
+    });
+    return result;
+}
+
 module.exports = {
     addSchoolYear,
     updateSchoolYear,
     deleteOne,
     getOne,
-    getAll
+    getAll,
+    getAllSemester
 }

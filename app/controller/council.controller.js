@@ -83,6 +83,15 @@ const getOneUpdate = async (req, res) => {
     }
 }
 
+const getListCouncil = async (req, res) => {
+    try {
+        const result = await councilService.getListCouncil();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     createCouncil,
     updateCouncil,
@@ -92,5 +101,6 @@ module.exports = {
     getAllSemester,
     getAllTeacher,
     councilStatus,
-    getOneUpdate
+    getOneUpdate,
+    getListCouncil
 }

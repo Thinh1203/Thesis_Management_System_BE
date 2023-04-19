@@ -96,6 +96,15 @@ const getTotalTeacher = async (req, res) => {
     }
 }
 
+const getListTeacher = async (req, res) => {
+    try {
+        const result = await teacherService.getListTeacher();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addTeacher,
     getAll,
@@ -106,5 +115,6 @@ module.exports = {
     search,
     accountStatus,
     uploadFile,
-    getTotalTeacher
+    getTotalTeacher,
+    getListTeacher
 }

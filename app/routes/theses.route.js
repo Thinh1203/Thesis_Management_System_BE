@@ -5,7 +5,7 @@ const user = require('../middleware/passport');
 const passport = require('passport');
 const { uploadFile } = require('../middleware/upload');
 
-router.post('/addTheses', thesesController.addTheses);
+router.post('/addTheses',passport.authenticate('jwt', {session: false}), user.requireUser, thesesController.addTheses);
 router.patch('/updateTheses/:id', thesesController.updateTheses);
 router.patch('/uploadFile/:id', uploadFile.single('file'), thesesController.uploadFile);
 router.get('/getOne/:id', thesesController.getOne);

@@ -12,7 +12,7 @@ const createCouncil = async (data) => {
     }); 
     let councilUser = [];
 
-    let html = `<p>Thời gian hội đồng diễn ra từ <b>${result.timeStart.slice(0, -3)}</b> đến <b>${result.timeEnd.slice(0, -3)}</b> ngày <b>${new Date(result.startDate).toLocaleDateString('en-GB')}</b></p>
+    let html = `<p>Thời gian hội đồng diễn ra từ <b>${result.timeStart}</b> đến <b>${result.timeEnd}</b> ngày <b>${new Date(result.startDate).toLocaleDateString('en-GB')}</b></p>
                 <h3>Danh sách thành viên hội đồng:</h3>
                 <table>
                     <thead>
@@ -82,19 +82,43 @@ const getOne = async (id) => {
     if(!check) 
         return BadRequestError(400, 'Council not found!');
     const result = await db.councils.findOne({        
-        attributes: { exclude: ['shoolYearId']}, 
+        attributes: { exclude: ['shoolYearId', 'status']}, 
         include: [
             {
                 model: db.councilDetails,
-                attributes: { exclude: ['id','councilId']}
-            }, {
+                attributes: { exclude: ['id','councilId','teacherId']},
+                include: [
+                    {
+                        model: db.teachers,
+                        attributes: ['account', 'fullName'] 
+                    } 
+                ]
+            }, 
+            {
                 model: db.schoolYears,
                 attributes: { exclude: ['id']},
+            },
+            {
+                model: db.theses,
+                attributes: ['endDate'],
+                include: [
+                    {
+                        model: db.topics
+                    },
+                    {
+                        model: db.students,
+                        attributes: ['fullName']
+                    },
+                    {
+                        model: db.teachers,
+                        attributes: ['fullName']
+                    },
+                ]
             }
         ],
         where: {id:id}
     });
-    return result;
+    return result ? ({statusCode: 200, data: result}) : ({statusCode: 400, message: 'Không tìm thấy!'});
 }
 
 
@@ -214,6 +238,14 @@ const councilStatus = async (id, data) => {
 //     } : BadRequestError(400, 'Council not found!');
 // }
 
+const getListCouncil = async () => {
+    const result = await db.councils.findAll({
+        order: [['id', 'DESC']],
+    });
+    return result;
+}
+
+
 module.exports = {
     createCouncil,
     updateCouncil,
@@ -223,5 +255,6 @@ module.exports = {
     getAllSemester,
     getAllTeacher,
     councilStatus,
-    getOneUpdate
+    getOneUpdate,
+    getListCouncil
 }

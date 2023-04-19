@@ -48,6 +48,10 @@ const uploadFile = async (file) => {
     const results = await csv().fromFile(file.path);
     for (const element of results) {
         try {
+            const checkUser = await db.students.findOne({ where: { account: element.Code } });
+            if (checkUser) {
+                return ({ statusCode: 400, message: 'Tài khoản đã tồn tại!' })
+            }
             let randomPassword = generatePassword();
             const hashPassword = await bcrypt.hash(randomPassword, 8);
             const user = await db.students.create({
@@ -192,6 +196,7 @@ const search = async (value, page) => {
         data: rows
     } : BadRequestError(400, 'error!');
 }
+
 const getTotalStudent = async () => {
     const { count, rows } = await db.students.findAndCountAll({
         attributes: { exclude: ['roleId', 'password'] },
@@ -200,6 +205,14 @@ const getTotalStudent = async () => {
         total: count,
         data: rows
     } : BadRequestError(400, 'User not found!');
+}
+
+const getListStudent = async () => {
+    const result = await db.students.findAll({
+        attributes: ['id', 'fullName'],
+        order: [['id', 'DESC']],
+    });
+    return result;
 }
 
 module.exports = {
@@ -212,5 +225,6 @@ module.exports = {
     accountStatus,
     uploadFile,
     search,
-    getTotalStudent
+    getTotalStudent,
+    getListStudent
 }

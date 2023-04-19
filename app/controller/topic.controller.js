@@ -38,9 +38,38 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const result = await topicService.getAll();
+        const { page } = req.query;
+        const result = await topicService.getAll(page);
         return res.json(result);
     } catch(error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const uploadFile = async (req, res) => {
+    try {
+        const result = await topicService.uploadFile(req.file);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const search = async (req, res) => {
+    try {
+        const { q, page } = req.query;
+        const result = await topicService.search(q, page);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const getListTopic = async (req, res) => {
+    try {
+        const result = await topicService.getListTopic();
+        return res.json(result);
+    } catch (error) {
         return res.status(500).json({ message: error });
     }
 }
@@ -50,5 +79,8 @@ module.exports = {
     updateTopic,
     deleteTopic,
     getOne,
-    getAll
+    getAll,
+    uploadFile,
+    search,
+    getListTopic
 }
