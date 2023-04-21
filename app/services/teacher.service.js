@@ -5,7 +5,7 @@ const validation = require('../utils/validation');
 let csv = require('csvtojson');
 const { sendMail } = require('../middleware/sendmail');
 const { generatePassword } = require('../utils/randomPassword');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 
 const addTeacher = async (data) => {
@@ -253,6 +253,60 @@ const getListTeacher = async () => {
     return result;
 }
 
+const getAllCouncil = async (id) => {
+    const kq1 = await db.councils.findAll({
+        include: [
+            {
+                model: db.theses,
+                // include: [
+                //     {
+                //         model: db.councils,
+
+                //     }
+                // ],
+                where: { teacherId: id }
+            }
+        ],
+    });
+    const newKq1 = kq1.map(e => {
+        return {
+            "id": e.id,
+            "code": e.code,
+            "status": e.status,
+            "timeStart": e.timeStart,
+            "timeEnd": e.timeEnd,
+            "startDate": e.startDate,
+            "shoolYearId": e.shoolYearId,
+            "position":  'gvhd'
+        }
+    });
+    const kq2 = await db.councils.findAll({
+        include: [
+            {
+                model: db.councilDetails,
+                where: { teacherId: id }
+            }
+        ]
+    });
+    const newKq2 = kq2.map(e => {
+        return {
+            "id": e.id,
+            "code": e.code,
+            "status": e.status,
+            "timeStart": e.timeStart,
+            "timeEnd": e.timeEnd,
+            "startDate": e.startDate,
+            "shoolYearId": e.shoolYearId,
+            "position":  e.councildetails[0].position
+        }
+    });
+    const kq = newKq1.concat(newKq2);
+
+    return kq
+    return kq1 ? { statusCode: 200, data1: kq1, data2: kq2 } : { statusCode: 400, message: "Không tìm thấy!" };
+};
+
+
 module.exports = {
     addTeacher,
     updateTeacher,
@@ -264,5 +318,6 @@ module.exports = {
     accountStatus,
     uploadFile,
     getTotalTeacher,
-    getListTeacher
+    getListTeacher,
+    getAllCouncil,
 }

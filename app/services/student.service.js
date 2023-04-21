@@ -109,7 +109,8 @@ const getAll = async (page) => {
             }
         ],
         limit: pageSize,
-        offset: offset
+        offset: offset,
+        order: [['id', 'DESC']],
     });
     const lastPage = Math.ceil(count / pageSize);
     const previousPage = currentPage - 1 > 0 ? currentPage - 1 : null;

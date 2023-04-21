@@ -37,6 +37,16 @@ const getAll = async (req, res) => {
     }
 }
 
+const getAllListTheses = async (req, res) => {
+    try {
+        const { page } = req.query;
+        const result = await thesesService.getAllListTheses(page);
+        return res.json(result);
+    } catch(error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 const deleteTheses = async (req, res) => {
     try {
         const result = await thesesService.deleteTheses(req.params.id);
@@ -63,6 +73,27 @@ const transcript = async (req, res) => {
         return res.status(500).json({ message: error });
     }
 }
+
+const search = async (req, res) => {
+    try {
+        const { q, page } = req.query;
+        const result = await thesesService.search(q, page);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const ListOfGuidedTopics = async (req, res) => {
+    try {
+     
+        const result = await thesesService.ListOfGuidedTopics(req.user.id);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addTheses,
     getAll,
@@ -70,5 +101,8 @@ module.exports = {
     updateTheses,
     deleteTheses,
     uploadFile,
-    transcript
+    transcript,
+    search,
+    ListOfGuidedTopics,
+    getAllListTheses
 }

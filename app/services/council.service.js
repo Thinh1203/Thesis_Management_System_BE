@@ -144,7 +144,7 @@ const getOneUpdate = async (id) => {
 }
 
 const getAll = async (page) => {
-    const pageSize = 4;
+    const pageSize = 5;
     const offset = (page - 1) * pageSize;
     const currentPage = parseInt(page);
     const { rows, count } = await db.councils.findAndCountAll({

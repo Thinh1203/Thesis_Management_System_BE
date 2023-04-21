@@ -7,7 +7,7 @@ const { uploadFile } = require('../middleware/upload');
 
 router.post('/createCouncil',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.createCouncil);
 router.patch('/updateCouncil/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.updateCouncil);
-router.get('/getOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOne);
+router.get('/getOne/:id' , councilController.getOne);
 router.get('/getAll',councilController.getAll);
 router.get('/getListCouncil',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.getListCouncil);
 router.delete('/deleteOne/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin ,councilController.deleteOne);
