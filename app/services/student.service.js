@@ -216,6 +216,52 @@ const getListStudent = async () => {
     return result;
 }
 
+const getTheses = async (id) => {
+    const result = await db.theses.findOne({
+        attributes: ['id','endDate', 'statusFile', 'score'],
+        where: {
+            studentId: id
+        },
+        include: [
+            {
+                model: db.topics,
+                attributes: { exclude: ['id']}
+            }, {
+                model: db.councils,
+                attributes: ['code']
+            }
+        ]
+    });
+    return result;
+}
+
+const getThesesDetail = async (id) => {
+    const result = await db.theses.findOne({
+        attributes: { exclude: ['topicId','teacherId', 'councilId', 'studentId', 'shoolYearId']},
+        where: {
+            id: id
+        },
+        include: [
+            {
+                model: db.topics,
+                attributes: { exclude: ['id']}
+            }, {
+                model: db.councils,
+                attributes: ['code']
+            }, {
+                model: db.teachers,
+                attributes: ['fullName']
+            },{
+                model: db.students,
+                attributes: ['fullName']
+            },{
+                model: db.schoolYears,
+            },
+        ]
+    });
+    return result;
+}
+
 module.exports = {
     addStudent,
     updateStudent,
@@ -227,5 +273,7 @@ module.exports = {
     uploadFile,
     search,
     getTotalStudent,
-    getListStudent
+    getListStudent,
+    getTheses,
+    getThesesDetail
 }

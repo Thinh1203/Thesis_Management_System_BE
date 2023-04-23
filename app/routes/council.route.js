@@ -15,5 +15,5 @@ router.get('/getAllSemester',passport.authenticate('jwt', {session: false}), use
 router.get('/getAllTeacher',passport.authenticate('jwt', {session: false}), user.requireAdmin,councilController.getAllTeacher);
 router.patch('/councilStatus/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.councilStatus);
 router.get('/getOneUpdate/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOneUpdate);
-
+router.get('/getOneDetail/:id' , passport.authenticate('jwt', {session: false}),user.requireUser ,councilController.getOneCouncilDetail);
 module.exports = router;

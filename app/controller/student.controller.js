@@ -102,6 +102,24 @@ const getListStudent = async (req, res) => {
     }
 }
 
+const getTheses = async (req, res) => {
+    try {
+        const result = await studentService.getTheses(req.user.id);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const getThesesDetail = async (req, res) => {
+    try {
+        const result = await studentService.getThesesDetail(req.params.id);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addStudent,
     getAll,
@@ -113,5 +131,7 @@ module.exports = {
     uploadFile,
     search,
     getTotalStudent,
-    getListStudent
+    getListStudent,
+    getTheses,
+    getThesesDetail
 }

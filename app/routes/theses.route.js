@@ -7,12 +7,14 @@ const { uploadFile } = require('../middleware/upload');
 
 router.post('/addTheses',passport.authenticate('jwt', {session: false}), user.requireUser, thesesController.addTheses);
 router.patch('/updateTheses/:id', thesesController.updateTheses);
-router.patch('/uploadFile/:id', uploadFile.single('file'), thesesController.uploadFile);
+router.patch('/uploadFile/:id', uploadFile.single('file'),user.requireUser, thesesController.uploadFile);
 router.get('/getOne/:id', thesesController.getOne);
 router.get('/getAll' ,thesesController.getAll);
 router.get('/getAllListTheses' ,thesesController.getAllListTheses);
 router.delete('/deleteTheses/:id',thesesController.deleteTheses);
-router.post('/transcript/:id', thesesController.transcript);
+router.post('/transcript/:id',passport.authenticate('jwt', {session: false}), user.requireUser, thesesController.transcript);
 router.get('/ListOfGuidedTopics',passport.authenticate('jwt', {session: false}), user.requireUser, thesesController.ListOfGuidedTopics);
-router.get('/search',passport.authenticate('jwt', {session: false}), user.requireAdmin , thesesController.search);
+router.get('/search',thesesController.search);
+router.get('/downloadFile/:id',thesesController.downLoadFile);
+router.get('/fileName/:id',thesesController.fileName);
 module.exports = router;

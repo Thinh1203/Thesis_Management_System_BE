@@ -211,32 +211,6 @@ const councilStatus = async (id, data) => {
     return (results) ? ({statusCode: 200, message: 'Successfully'}) : ({statusCode: 400, message: 'error'});
 }
 
-// const getOneDetailCouncil = async (id, page) => {
-//     const pageSize = 5;
-//     const offset = (page - 1) * pageSize;
-//     const currentPage = parseInt(page);
-//     const { rows, count } = await db.councils.findAndCountAll({
-//         attributes: { exclude: ['shoolYearId']}, 
-//         include: [
-//             {
-//                 model: db.schoolYears,
-//                 attributes: { exclude: ['id']},
-//             }
-//         ],
-//         order: [['id', 'DESC']],
-//         limit: pageSize,
-//         offset: offset
-//     });  
-//     const lastPage = Math.ceil(count / pageSize);
-//     const previousPage = currentPage - 1 > 0 ? currentPage - 1 : null;
-//     const nextPage = currentPage + 1 <= lastPage ? currentPage + 1 : null;
-//     return rows.length ? {
-//         currentPage: currentPage,
-//         previousPage, nextPage, lastPage,
-//         total: count,
-//         data: rows
-//     } : BadRequestError(400, 'Council not found!');
-// }
 
 const getListCouncil = async () => {
     const result = await db.councils.findAll({
@@ -245,6 +219,30 @@ const getListCouncil = async () => {
     return result;
 }
 
+const getOneCouncilDetail = async (id, userId) => {
+    const result = await db.theses.findAll({        
+       attributes: ['id' ,'reportFile', 'score'],
+       include: [
+        {
+            model: db.topics
+        },
+        {
+            model: db.councils,
+            attributes: ['code', 'id'],
+            where: {id: id}
+        },
+        {
+            model: db.students,
+            attributes: ['fullName']
+        },
+        {
+            model: db.transcripts,
+            where: {teacherId: userId}
+        },
+       ]
+    });
+    return result ? ({statusCode: 200, data: result}) : ({statusCode: 400, message: 'Không tìm thấy!'});
+}
 
 module.exports = {
     createCouncil,
@@ -256,5 +254,6 @@ module.exports = {
     getAllTeacher,
     councilStatus,
     getOneUpdate,
-    getListCouncil
+    getListCouncil,
+    getOneCouncilDetail
 }

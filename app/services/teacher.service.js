@@ -257,6 +257,14 @@ const getAllCouncil = async (id) => {
     const kq1 = await db.councils.findAll({
         include: [
             {
+                model: db.councilDetails,
+                where: { teacherId: id }
+            }
+        ]
+    });
+    const kq2 = await db.councils.findAll({
+        include: [
+            {
                 model: db.theses,
                 // include: [
                 //     {
@@ -268,6 +276,7 @@ const getAllCouncil = async (id) => {
             }
         ],
     });
+
     const newKq1 = kq1.map(e => {
         return {
             "id": e.id,
@@ -277,17 +286,11 @@ const getAllCouncil = async (id) => {
             "timeEnd": e.timeEnd,
             "startDate": e.startDate,
             "shoolYearId": e.shoolYearId,
-            "position":  'gvhd'
+            "position": e.councildetails[0].position
+            
         }
     });
-    const kq2 = await db.councils.findAll({
-        include: [
-            {
-                model: db.councilDetails,
-                where: { teacherId: id }
-            }
-        ]
-    });
+
     const newKq2 = kq2.map(e => {
         return {
             "id": e.id,
@@ -297,13 +300,12 @@ const getAllCouncil = async (id) => {
             "timeEnd": e.timeEnd,
             "startDate": e.startDate,
             "shoolYearId": e.shoolYearId,
-            "position":  e.councildetails[0].position
+            "position": 'gvhd'
         }
     });
     const kq = newKq1.concat(newKq2);
 
-    return kq
-    return kq1 ? { statusCode: 200, data1: kq1, data2: kq2 } : { statusCode: 400, message: "Không tìm thấy!" };
+    return kq;
 };
 
 

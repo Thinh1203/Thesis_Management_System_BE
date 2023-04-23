@@ -4,7 +4,7 @@ const now = new Date();
 now.toLocaleString('vn-VI', { timeZone: 'Asia/Ho_Chi_Minh' });
 let imageStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'upload/csv/');
+        cb(null, 'public/upload/csv/');
     },
     filename: function(req, file, cb) {
         cb(null, `${now.getDate()}_${now.getHours()}_${now.getMinutes()}-${file.originalname}`);
@@ -21,10 +21,11 @@ let imageValidate =  function fileFilter(req, file, cb) {
 
 let fileStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'upload/files/');
+        cb(null, 'public/upload/files/');
     },
     filename: function(req, file, cb) {
-        cb(null, `${now.getDate()}_${now.getHours()}_${now.getMinutes()}-${file.originalname}`);
+        // cb(null, `${now.getDate()}_${now.getHours()}_${now.getMinutes()}-${file.originalname}`);
+        cb(null, file.originalname);
     },
 });
 

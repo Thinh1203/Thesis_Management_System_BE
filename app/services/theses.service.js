@@ -239,37 +239,54 @@ const deleteTheses = async (id) => {
 }
 
 const uploadFile = async (file, id) => {
-
     const theses = await db.theses.findOne({ where: { id: id } });
-
     if (!theses) {
-        return BadRequestError(400, 'Theses not found!');
+        return BadRequestError(400, 'Theses không tồn tại!');
     }
     if (!file) {
-        return BadRequestError(400, 'File is not empty!');
+        return BadRequestError(400, 'File không được trống!');
     }
-    const result = await db.theses.update({ reportFile: file.path }, { where: { id: id } });
-    return (result) ? ({ message: 'Successfully' }) : ({ message: 'error' });
+    const result = await db.theses.update({ reportFile: file.path, statusFile: true }, { where: { id: id } });
+    return (result) ? ({ statusCode: 200, message: 'Nộp file thành công!' }) : ({ statusCode: 400, message: 'Có lỗi xảy ra!' });
 }
 
+const downLoadFile = async (id) => {
+    const theses = await db.theses.findOne({ where: { id: id } });
+    if (!theses) {
+        return { statusCode: 400, message: 'Theses không tồn tại!' };
+    }
+    return { file: theses.reportFile };
+};
+
+const fileName = async (id) => {
+    const theses = await db.theses.findOne({ where: { id: id } });
+    if (!theses) {
+        return { statusCode: 400, message: 'Theses không tồn tại!' };
+    }
+    const filePath = theses.reportFile;
+    const fileName = filePath.split('\\').pop();
+    return fileName;
+};
+
 const transcript = async (data, id, user) => {
-    const teacherId = await db.teachers.findOne({ where: { id: user.id } });
+    // const teacherId = await db.teachers.findOne({ where: { id: user.id } });
     const result = await db.transcripts.create({
         score: data.score,
-        teacherId: teacherId.id,
-        thesesId: id
+        teacherId: user.id,
+        thesisId: id
     });
-
-    const updateScore = await db.transcripts.findOne({ where: { thesesId: id } });
+  
+    const updateScore = await db.transcripts.findOne({ where: { thesisId: id } });
     if (updateScore.length == 3) {
         let totalScore = 0;
         for (let i = 0; i < 3; i++) {
             totalScore += updateScore[i].score;
         }
-        sum = totalScore / 3;
+        let sum = totalScore / 3;
         const updateScoreThese = await db.theses.update({ score: sum, where: { id: id } });
     }
-    return result;
+
+    return result ? ({ statusCode: 200 }) : ({ statusCode: 400 });
 }
 
 const search = async (value, page) => {
@@ -277,44 +294,44 @@ const search = async (value, page) => {
     const offset = (page - 1) * pageSize;
     const currentPage = parseInt(page);
     const { count, rows } = await db.theses.findAndCountAll({
-       
-            include: [
-                {
-                    model: db.topics,
-                    as: 'topic',
-                    required: false,
-                    attributes: ['id', 'code', 'VietnameseName', 'EnglishName']
-                },
-                {
-                    model: db.councils,
-                    attributes: ['code']
-                },
-                {
-                    model: db.schoolYears,
-                    attributes: ['year', 'semester']
-                },
-                {
-                    model: db.students,
-                    as: 'student',
-                    required: false,
-                    attributes: ['id', 'fullName']
-                },
-                {
-                    model: db.teachers,
-                    as: 'teacher',
-                    required: false,
-                    attributes: ['id', 'fullName']
-                }
-            ],
-            where: {
-                [Op.or]: [
-                    { '$topic.code$': { [Op.like]: `%${value}%` } },
-                    { '$topic.Vietnamese_name$': { [Op.like]: `%${value}%` } },
-                    { '$topic.English_name$': { [Op.like]: `%${value}%` } },
-                    { '$student.full_name$': { [Op.like]: `%${value}%` } },
-                    { '$teacher.full_name$': { [Op.like]: `%${value}%` } }
-                ]
+
+        include: [
+            {
+                model: db.topics,
+                as: 'topic',
+                required: false,
+                attributes: ['id', 'code', 'VietnameseName', 'EnglishName']
             },
+            {
+                model: db.councils,
+                attributes: ['code']
+            },
+            {
+                model: db.schoolYears,
+                attributes: ['year', 'semester']
+            },
+            {
+                model: db.students,
+                as: 'student',
+                required: false,
+                attributes: ['id', 'fullName']
+            },
+            {
+                model: db.teachers,
+                as: 'teacher',
+                required: false,
+                attributes: ['id', 'fullName']
+            }
+        ],
+        where: {
+            [Op.or]: [
+                { '$topic.code$': { [Op.like]: `%${value}%` } },
+                { '$topic.Vietnamese_name$': { [Op.like]: `%${value}%` } },
+                { '$topic.English_name$': { [Op.like]: `%${value}%` } },
+                { '$student.full_name$': { [Op.like]: `%${value}%` } },
+                { '$teacher.full_name$': { [Op.like]: `%${value}%` } }
+            ]
+        },
 
         limit: pageSize,
         offset: offset
@@ -350,7 +367,49 @@ const ListOfGuidedTopics = async (id) => {
             }
         ],
     });
-    return result ? ({statusCode: 200, data: result}) : ({statusCode: 400, message: 'Không tìm thấy!'});
+    return result ? ({ statusCode: 200, data: result }) : ({ statusCode: 400, message: 'Không tìm thấy!' });
+}
+
+const getAllTopicComplete = async (userId, page) => {
+    const pageSize = 6;
+    const offset = (page - 1) * pageSize;
+    const currentPage = parseInt(page);
+    const { rows, count } = await db.theses.findAndCountAll({
+        attributes: { exclude: ['topicId', 'shoolYearId', 'studentId', 'teacherId', 'councilId'] },
+        include: [
+            {
+                model: db.topics,
+                attributes: { exclude: ['id'] }
+            },
+            {
+                model: db.students,
+                attributes: ['fullName'],
+            },
+            {
+                model: db.schoolYears,
+                attributes: ['year', 'semester']
+            }
+        ],
+        where: {
+            teacherId: id,
+            score: {
+                [Op.gt]: 0
+            }
+        },
+        limit: pageSize,
+        offset: offset,
+        order: [['id', 'DESC']],
+    });
+    const lastPage = Math.ceil(count / pageSize);
+    const previousPage = currentPage - 1 > 0 ? currentPage - 1 : null;
+    const nextPage = currentPage + 1 <= lastPage ? currentPage + 1 : null;
+
+    return rows.length ? {
+        currentPage: currentPage,
+        previousPage, nextPage, lastPage,
+        total: count,
+        data: rows
+    } : BadRequestError(400, 'Không tồn tại khóa luận nào!');
 }
 
 module.exports = {
@@ -363,7 +422,10 @@ module.exports = {
     transcript,
     search,
     getAllListTheses,
-    ListOfGuidedTopics
+    ListOfGuidedTopics,
+    downLoadFile,
+    fileName,
+    getAllTopicComplete
 }
 
 
