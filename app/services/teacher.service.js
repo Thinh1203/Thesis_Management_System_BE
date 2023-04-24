@@ -230,6 +230,9 @@ const getTotalTeacher = async () => {
                 where: { code: { [Op.ne]: 'admin' } }
             }
         ],
+        where: {
+            status: true
+        }
     });
     return rows.length ? {
         total: count,

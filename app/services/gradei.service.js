@@ -56,22 +56,16 @@ const getOne = async (id) => {
     return result;
 }
 
-const getAll = async (user) => {
+const getAll = async () => {
     const result = await db.students.findAll({
-        attributes: { exclude: ['roleId', 'departmentId', 'gradeiId', 'createdAt', 'updatedAt', 'account', 'password']},
+        attributes: { exclude: ['roleId', 'createdAt', 'updatedAt', 'password']},
         include: [
             {
                 model: db.gradeIs,
-                attributes: { exclude: ['id']},
-            },
-            {
-                model: db.roles,
-                where: { code: 'SV' }
-            }   
+            }  
         ],
         where: {
-            departmentId: user.department,
-            gradeiId: { [Op.not]: null }
+            gradeiId: true
         }
     });
     return result;
@@ -85,11 +79,25 @@ const deleteOne = async (id) => {
     const result = await db.gradeIs.destroy({ where: { id: id }});
     return (result) ? ({message: 'Delete successful'}) : ({message: 'error'});
 }
+const downLoadFile = async (id) => {
+    const result = await db.gradeIs.findOne({ where: { id: id } });
+
+    return { file: result.file };
+};
+
+const fileName = async (id) => {
+    const result = await db.gradeIs.findOne({ where: { id: id } });
+    const filePath = result.file;
+    const fileName = filePath.split('\\').pop();
+    return fileName;
+};
 
 module.exports = {
     create,
     getAll,
     getOne,
     updateOne,
-    deleteOne
+    deleteOne,
+    downLoadFile,
+    fileName
 }

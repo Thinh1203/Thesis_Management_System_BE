@@ -201,6 +201,9 @@ const search = async (value, page) => {
 const getTotalStudent = async () => {
     const { count, rows } = await db.students.findAndCountAll({
         attributes: { exclude: ['roleId', 'password'] },
+        where: {
+            status: true
+        }
     });
     return rows.length ? {
         total: count,

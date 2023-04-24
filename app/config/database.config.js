@@ -79,11 +79,14 @@ const sequelize = new Sequelize(
     db.schoolYears.hasMany(db.theses);
     db.theses.belongsTo(db.schoolYears);
 
+
     // many-to-many
 
     db.teachers.belongsToMany(db.theses, { through: 'transcripts'});
     db.theses.belongsToMany(db.teachers, { through: 'transcripts'});
 
+    db.councils.belongsToMany(db.teachers, { through: 'transcripts'});
+    db.teachers.belongsToMany(db.councils, { through: 'transcripts'});
 
     db.sequelize.sync({alter: true})
     .then(() => {

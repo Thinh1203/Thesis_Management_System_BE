@@ -269,21 +269,26 @@ const fileName = async (id) => {
 };
 
 const transcript = async (data, id, user) => {
-    // const teacherId = await db.teachers.findOne({ where: { id: user.id } });
+
     const result = await db.transcripts.create({
         score: data.score,
         teacherId: user.id,
-        thesisId: id
+        thesisId: id,
+        councilId: data.idCouncil
     });
   
-    const updateScore = await db.transcripts.findOne({ where: { thesisId: id } });
-    if (updateScore.length == 3) {
+    const updateScore = await db.transcripts.findAll({ where: { thesisId: id } });
+
+    if (updateScore.length === 3) {
         let totalScore = 0;
         for (let i = 0; i < 3; i++) {
             totalScore += updateScore[i].score;
         }
-        let sum = totalScore / 3;
-        const updateScoreThese = await db.theses.update({ score: sum, where: { id: id } });
+        let sum = 0;
+        sum = Math.round(totalScore / 3);
+     
+        const updateScoreThese = await db.theses.update({score: sum}, { where: { id: id } });
+
     }
 
     return result ? ({ statusCode: 200 }) : ({ statusCode: 400 });
@@ -370,47 +375,126 @@ const ListOfGuidedTopics = async (id) => {
     return result ? ({ statusCode: 200, data: result }) : ({ statusCode: 400, message: 'Không tìm thấy!' });
 }
 
-const getAllTopicComplete = async (userId, page) => {
-    const pageSize = 6;
-    const offset = (page - 1) * pageSize;
-    const currentPage = parseInt(page);
-    const { rows, count } = await db.theses.findAndCountAll({
-        attributes: { exclude: ['topicId', 'shoolYearId', 'studentId', 'teacherId', 'councilId'] },
+const getAllTopicComplete = async (id) => {
+
+    const result = await db.theses.findAll({
+        where: {
+            [Op.and]: [{ teacherId: id }, { score: { [Op.not]: null } }],
+        },
         include: [
             {
-                model: db.topics,
-                attributes: { exclude: ['id'] }
-            },
-            {
                 model: db.students,
-                attributes: ['fullName'],
+                attributes: ['fullName']
             },
             {
-                model: db.schoolYears,
-                attributes: ['year', 'semester']
+                model: db.topics,
+            },
+            {
+                model: db.schoolYears
             }
         ],
+    });
+    return result ? ({ statusCode: 200, data: result }) : ({ statusCode: 400, message: 'Không tìm thấy!' });
+}
+
+const listThesesComplete = async (page) => {
+    const pageSize = 5;
+    const offset = (page - 1) * pageSize;
+    const currentPage = parseInt(page);
+    const {rows, count} = await db.theses.findAndCountAll({
         where: {
-            teacherId: id,
-            score: {
-                [Op.gt]: 0
+            score: { [Op.gt]: 4 },
+        }, 
+        include: [
+            {
+                model: db.students,
+                attributes: ['fullName']
+            },
+            {
+                model: db.topics,
+            },
+            {
+                model: db.schoolYears
             }
-        },
+        ],
         limit: pageSize,
-        offset: offset,
-        order: [['id', 'DESC']],
+        offset: offset
     });
     const lastPage = Math.ceil(count / pageSize);
     const previousPage = currentPage - 1 > 0 ? currentPage - 1 : null;
     const nextPage = currentPage + 1 <= lastPage ? currentPage + 1 : null;
-
     return rows.length ? {
+        statusCode: 200,
         currentPage: currentPage,
         previousPage, nextPage, lastPage,
         total: count,
         data: rows
-    } : BadRequestError(400, 'Không tồn tại khóa luận nào!');
+} : BadRequestError(400, 'error!');}
+
+const searchThesesComplete = async (value, page) => {
+    const pageSize = 5;
+    const offset = (page - 1) * pageSize;
+    const currentPage = parseInt(page);
+    const { count, rows } = await db.theses.findAndCountAll({
+
+        include: [
+            {
+                model: db.topics,
+                as: 'topic',
+                required: false,
+                attributes: ['id', 'code', 'VietnameseName', 'EnglishName']
+            },
+            {
+                model: db.schoolYears,
+                attributes: ['year', 'semester']
+            },
+            {
+                model: db.students,
+                as: 'student',
+                required: false,
+                attributes: ['id', 'fullName']
+            },
+
+        ],
+        where: {
+            [Op.or]: [
+                { '$topic.code$': { [Op.like]: `%${value}%` } },
+                { '$topic.Vietnamese_name$': { [Op.like]: `%${value}%` } },
+                { '$topic.English_name$': { [Op.like]: `%${value}%` } },
+                { '$student.full_name$': { [Op.like]: `%${value}%` } },
+
+            ],
+            
+            score: { [Op.gt]: 4 },
+            
+        },
+
+        limit: pageSize,
+        offset: offset
+    });
+    const lastPage = Math.ceil(count / pageSize);
+    const previousPage = currentPage - 1 > 0 ? currentPage - 1 : null;
+    const nextPage = currentPage + 1 <= lastPage ? currentPage + 1 : null;
+    return rows.length ? {
+        statusCode: 200,
+        currentPage: currentPage,
+        previousPage, nextPage, lastPage,
+        total: count,
+        data: rows
+    } : BadRequestError(400, 'error!');
 }
+const getTotalTheses = async () => {
+    const { count, rows } = await db.theses.findAndCountAll({
+        where: {
+            score: { [Op.gt]: 4 },
+        }, 
+    });
+    return rows.length ? {
+        total: count,
+        data: rows
+    } : BadRequestError(400, 'Council not found!');
+}
+
 
 module.exports = {
     addTheses,
@@ -425,7 +509,10 @@ module.exports = {
     ListOfGuidedTopics,
     downLoadFile,
     fileName,
-    getAllTopicComplete
+    getAllTopicComplete,
+    listThesesComplete,
+    searchThesesComplete,
+    getTotalTheses
 }
 
 

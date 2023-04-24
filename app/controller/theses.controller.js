@@ -118,6 +118,44 @@ const fileName = async (req, res) => {
     }
 };
 
+const getAllTopicComplete = async (req, res) => {
+    try {
+
+        const result = await thesesService.getAllTopicComplete(req.user.id);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const listThesesComplete = async (req, res) => {
+    try {
+        const { page } = req.query;
+        const result = await thesesService.listThesesComplete(page);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const searchThesesComplete = async (req, res) => {
+    try {
+        const { q, page } = req.query;
+        const result = await thesesService.searchThesesComplete(q, page);
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+const getTotalTheses = async (req, res) => {
+    try {
+        const result = await thesesService.getTotalTheses();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
 module.exports = {
     addTheses,
     getAll,
@@ -130,5 +168,9 @@ module.exports = {
     ListOfGuidedTopics,
     getAllListTheses,
     downLoadFile,
-    fileName
+    fileName,
+    getAllTopicComplete,
+    listThesesComplete,
+    searchThesesComplete,
+    getTotalTheses
 }

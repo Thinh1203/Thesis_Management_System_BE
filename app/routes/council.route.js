@@ -16,4 +16,6 @@ router.get('/getAllTeacher',passport.authenticate('jwt', {session: false}), user
 router.patch('/councilStatus/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.councilStatus);
 router.get('/getOneUpdate/:id',passport.authenticate('jwt', {session: false}),user.requireAdmin , councilController.getOneUpdate);
 router.get('/getOneDetail/:id' , passport.authenticate('jwt', {session: false}),user.requireUser ,councilController.getOneCouncilDetail);
+router.get('/scoreDetail/:id' , passport.authenticate('jwt', {session: false}),user.requireUser ,councilController.scoreDetail);
+router.get('/getTotalCouncil', passport.authenticate('jwt', {session: false}), user.requireAdmin , councilController.getTotalCouncil);
 module.exports = router;

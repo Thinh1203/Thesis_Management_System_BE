@@ -30,7 +30,7 @@ const getOne = async (req, res) => {
 const getAll = async (req, res) => {
     try {
 
-        const result = await gradeService.getAll(req.user);
+        const result = await gradeService.getAll();
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });
@@ -46,10 +46,36 @@ const deleteOne = async (req, res) => {
     }
 }
 
+const downLoadFile = async (req, res) => {
+    try {
+        const result = await gradeService.downLoadFile(req.params.id);
+        if (result.statusCode === 400) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.download(result.file);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+};
+
+const fileName = async (req, res) => {
+    try {
+        const result = await gradeService.fileName(req.params.id);
+        if (result.statusCode === 400) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+};
+
 module.exports = {
     create,
     getAll,
     getOne,
     updateOne,
-    deleteOne
+    deleteOne,
+    downLoadFile,
+    fileName
 }

@@ -101,6 +101,24 @@ const getOneCouncilDetail = async (req, res) => {
     }
 }
 
+const scoreDetail = async (req, res) => {
+    try {
+        const result = await councilService.scoreDetail(req.params.id, req.user.id);
+        return res.json(result);
+    } catch(error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+
+const getTotalCouncil = async (req, res) => {
+    try {
+        const result = await councilService.getTotalCouncil();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
 module.exports = {
     createCouncil,
     updateCouncil,
@@ -112,5 +130,7 @@ module.exports = {
     councilStatus,
     getOneUpdate,
     getListCouncil,
-    getOneCouncilDetail
+    getOneCouncilDetail,
+    scoreDetail,
+    getTotalCouncil
 }

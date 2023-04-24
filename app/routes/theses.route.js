@@ -17,4 +17,9 @@ router.get('/ListOfGuidedTopics',passport.authenticate('jwt', {session: false}),
 router.get('/search',thesesController.search);
 router.get('/downloadFile/:id',thesesController.downLoadFile);
 router.get('/fileName/:id',thesesController.fileName);
+router.get('/getAllTopicComplete',passport.authenticate('jwt', {session: false}), user.requireUser,thesesController.getAllTopicComplete);
+router.get('/listThesesComplete',passport.authenticate('jwt', {session: false}), user.requireAdmin,thesesController.listThesesComplete);
+router.get('/searchThesesComplete',thesesController.searchThesesComplete);
+router.get('/getTotalTheses', passport.authenticate('jwt', {session: false}), user.requireAdmin , thesesController.getTotalTheses);
+
 module.exports = router;
