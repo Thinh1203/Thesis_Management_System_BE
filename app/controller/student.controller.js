@@ -120,6 +120,16 @@ const getThesesDetail = async (req, res) => {
     }
 }
 
+const getListStudentGrade = async (req, res) => {
+    try {
+        const result = await studentService.getListStudentGrade();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+
 module.exports = {
     addStudent,
     getAll,
@@ -133,5 +143,6 @@ module.exports = {
     getTotalStudent,
     getListStudent,
     getTheses,
-    getThesesDetail
+    getThesesDetail,
+    getListStudentGrade
 }

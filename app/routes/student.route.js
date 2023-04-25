@@ -18,5 +18,6 @@ router.get('/getTotalStudent', passport.authenticate('jwt', {session: false}), u
 router.get('/getListStudent',passport.authenticate('jwt', {session: false}), user.requireAdmin ,userController.getListStudent);
 router.get('/getTheses',passport.authenticate('jwt', {session: false}), user.requireUser ,userController.getTheses);
 router.get('/getThesesDetail/:id',passport.authenticate('jwt', {session: false}), user.requireUser ,userController.getThesesDetail);
+router.get('/getListStudentGrade',passport.authenticate('jwt', {session: false}), user.requireAdmin ,userController.getListStudentGrade);
 
 module.exports = router;

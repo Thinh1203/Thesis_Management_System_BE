@@ -5,7 +5,7 @@ const validation = require('../utils/validation');
 let csv = require('csvtojson');
 const { sendMail } = require('../middleware/sendmail');
 const { generatePassword } = require('../utils/randomPassword');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -265,6 +265,33 @@ const getThesesDetail = async (id) => {
     return result;
 }
 
+const getListStudentGrade = async () => {
+    const result = await db.students.findAll({
+        attributes: ['id', 'account', 'fullName', 'email'],
+        include: [
+            {
+                model: db.gradeIs,
+                where: { status: 'yes' }
+            },
+            {
+                model: db.theses,
+                attributes: ['id'],
+                include: [
+                    {
+                        model: db.topics
+                    },
+                    {
+                        model: db.schoolYears,
+                   
+                    }
+                ]
+            }
+        ]
+    });
+
+    return result;
+}
+
 module.exports = {
     addStudent,
     updateStudent,
@@ -278,5 +305,6 @@ module.exports = {
     getTotalStudent,
     getListStudent,
     getTheses,
-    getThesesDetail
+    getThesesDetail,
+    getListStudentGrade
 }

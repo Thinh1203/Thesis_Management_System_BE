@@ -20,7 +20,7 @@ const updateOne = async (req, res) => {
 
 const getOne = async (req, res) => {
     try {
-        const result = await gradeService.getOne(req.params.id);
+        const result = await gradeService.getOne(req.user.id);
         return res.json(result);
     } catch(error) {
         return res.status(500).json({ message: error });

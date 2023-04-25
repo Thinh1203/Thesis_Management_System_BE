@@ -16,7 +16,7 @@ const create = async (user,file) => {
     });
     const student = await db.students.update({gradeiId: result.id}, { where: { id: user.id }});
     // const teacher = await db.teachers.findOne({ where: { [Op.and]: [{departmentId: student.departmentId}, {code: 'TK'}]}});
-    return result;
+    return result ? ({statusCode: 200}) : ({statusCode: 400});
 }
 
 const updateOne = async (data, id) => {
@@ -24,32 +24,33 @@ const updateOne = async (data, id) => {
     if(!grade) {
         return new BadRequestError(400,'Not found!');
     }
+
     const user = await db.students.findOne({ where: { gradeiId: id }});
 
-    const result = await db.gradeIs.update(data, {where: {id:id}});
+    const result = await db.gradeIs.update({status: data.status}, {where: {id:id}});
 
     const gradeI = await db.gradeIs.findOne({ where: { id: id }});
+
+    if (gradeI.status == "yes") {
+        const updateAccount = await db.students.update({status: false}, {where: { id: user.id }});
+    }
 
     const subject = 'Đơn xin điểm i';
     let html = '';
     if(gradeI.status == 'yes'){
-        html = `<p>Đơn xin điểm i của bạn đã được đồng ý!.</p>`;
+        html = `<p>Đơn xin điểm i của bạn đã được đồng ý! Tài khoản đăng nhập hệ thống sẽ tạm khóa.</p>`;
     } else {
         html = `<p>Đơn xin điểm i của bạn đã bị từ chối!.</p>`;
     }
     sendMail(user.email, subject, html);
-    return (result) ? ({message: 'Update successful'}) : ({message: 'error'});
+    return (result) ? ({statusCode: 200}) : ({statusCode: 400});
 }
 
 const getOne = async (id) => {
-    const check = await db.gradeIs.findOne({ where: { id: id }});
-    if(!check) {
-        return new BadRequestError(400,'Not found!');
-    }
-    const result = await db.gradeIs.findOne({
+    const result = await db.students.findOne({
+        attributes: ['id', 'fullName'],
         include: [{
-            model: db.students,
-            attributes: { exclude: ['roleId', 'departmentId', 'gradeiId', 'createdAt', 'updatedAt', 'account', 'password']},
+            model: db.gradeIs
         }], 
         where: { id: id }
     });
@@ -62,11 +63,9 @@ const getAll = async () => {
         include: [
             {
                 model: db.gradeIs,
+                where: {status: 'waiting'}
             }  
         ],
-        where: {
-            gradeiId: true
-        }
     });
     return result;
 }
