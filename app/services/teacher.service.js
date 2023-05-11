@@ -119,7 +119,8 @@ const getAll = async (user, page) => {
                 }
             ],
             limit: pageSize,
-            offset: offset
+            offset: offset,
+            order: [['id', 'DESC']],
         });
 
         const lastPage = Math.ceil(count / pageSize);
@@ -311,6 +312,27 @@ const getAllCouncil = async (id) => {
     return kq;
 };
 
+const getAllTopicTutorial = async (id) => {
+
+    const result = await db.theses.findAll({
+        where: {
+            [Op.and]: [{ teacherId: id }, { score: { [Op.not]: null } }],
+        },
+        include: [
+            {
+                model: db.students,
+                attributes: ['fullName']
+            },
+            {
+                model: db.topics,
+            },
+            {
+                model: db.schoolYears
+            }
+        ],
+    });
+    return result ? ({ statusCode: 200, data: result }) : ({ statusCode: 400, message: 'Không tìm thấy!' });
+}
 
 module.exports = {
     addTeacher,
@@ -325,4 +347,5 @@ module.exports = {
     getTotalTeacher,
     getListTeacher,
     getAllCouncil,
+    getAllTopicTutorial
 }

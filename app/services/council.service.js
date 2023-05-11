@@ -12,7 +12,7 @@ const createCouncil = async (data) => {
     });
     let councilUser = [];
 
-    let html = `<p>Thời gian hội đồng diễn ra từ <b>${result.timeStart}</b> đến <b>${result.timeEnd}</b> ngày <b>${new Date(result.startDate).toLocaleDateString('en-GB')}</b></p>
+    let html = `<p>Địa điểm diễn ra: <b>${result.code}</b>. Thời gian hội đồng diễn ra từ <b>${result.timeStart}</b> đến <b>${result.timeEnd}</b> ngày <b>${new Date(result.startDate).toLocaleDateString('en-GB')}</b></p>
                 <h3>Danh sách thành viên hội đồng:</h3>
                 <table>
                     <thead>
@@ -22,6 +22,7 @@ const createCouncil = async (data) => {
                         </tr>
                     </thead>
                     <tbody>`;
+                 
     for (let i = 0; i < data.user.length; i++) {
         const council = await db.councilDetails.create({
             position: data.user[i].position,
@@ -43,9 +44,9 @@ const createCouncil = async (data) => {
             `;
     for (let i = 0; i < data.user.length; i++) {
         const findUser = await db.teachers.findOne({ where: { id: data.user[i].userId } });
-        const subject = `Bạn đã được thêm vào hội đồng ${data.code} `;
+        const subject = `Bạn đã được thêm vào hội đồng HD${result.id} `;
         const emailHtml = `<p>Xin chào ${findUser.fullName},</p>
-                            <p>Bạn đã được thêm vào hội đồng ${data.code}. Danh sách thành viên hội đồng và vị trí của họ được liệt kê dưới đây:</p>
+                            <p>Bạn đã được thêm vào hội đồng HD${result.id}. Danh sách thành viên hội đồng và vị trí của họ được liệt kê dưới đây:</p>
                             ${html}
                         `;
         sendMail(findUser.email, subject, emailHtml);
@@ -59,7 +60,7 @@ const updateCouncil = async (id, data) => {
     if (!council) return BadRequestError(400, 'Council not found!');
     let result;
 
-    if (data.timeStart || data.timeEnd || data.startDate) {
+    if (data.code || data.timeStart || data.timeEnd || data.startDate) {
         result = await db.councils.update(data, { where: { id: id } });
         const councilMember = await db.councilDetails.findAll({ where: { councilId: council.id } });
 
@@ -67,8 +68,8 @@ const updateCouncil = async (id, data) => {
 
         for (let i = 0; i < councilMember.length; i++) {
             let findUser = await db.teachers.findByPk(councilMember[i].teacherId);
-            const subject = `Cập nhật thời gian hội đồng ${council.code} `;
-            const emailHtml = `<p>Thời gian hội đồng diễn ra từ <b>${councils.timeStart.slice(0, -3)}</b> đến <b>${councils.timeEnd.slice(0, -3)}</b> <b>${new Date(councils.startDate).toLocaleDateString('en-GB')}</b></p>`;
+            const subject = `Cập nhật hội đồng HD${council.id} `;
+            const emailHtml = `<p>Địa điểm diễn ra: <b>${councils.code}</b> Thời gian hội đồng diễn ra từ <b>${councils.timeStart.slice(0, -3)}</b> đến <b>${councils.timeEnd.slice(0, -3)}</b> Ngày: <b>${new Date(councils.startDate).toLocaleDateString('en-GB')}</b></p>`;
             sendMail(findUser.email, subject, emailHtml);
         }
         return (result) ? ({ statusCode: 200, message: 'Cập nhật thành công' }) : ({ statuscode: 400, message: 'có lỗi xảy ra!' });
@@ -187,7 +188,9 @@ const deleteOne = async (id) => {
 }
 
 const getAllSemester = async () => {
-    const results = await db.schoolYears.findAll();
+    const results = await db.schoolYears.findAll({
+        order: [['id', 'DESC']],
+    });
     return (results) ? ({ statusCode: 200, message: 'Successfully', data: results }) : ({ statusCode: 400, message: 'error' });
 }
 

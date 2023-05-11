@@ -28,8 +28,8 @@ const addTheses = async (data) => {
         ], where: { id: result.councilId }
     });
 
-    const subject = `Bạn đã được thêm vào hội đồng ${council.code}`;
-    let html = `<p>Thời gian hội đồng diễn ra từ <b>${council.timeStart.slice(0, -3)}</b> đến <b>${council.timeEnd.slice(0, -3)}</b> <b>${new Date(council.startDate).toLocaleDateString('en-GB')}</b></p>
+    const subject = `Bạn đã được thêm vào hội đồng HD${council.id}`;
+    let html = `<p>Địa điểm diễn ra hội đồng: <b>${council.code}</b>. Thời gian hội đồng diễn ra từ <b>${council.timeStart.slice(0, -3)}</b> đến <b>${council.timeEnd.slice(0, -3)}</b> <b>${new Date(council.startDate).toLocaleDateString('en-GB')}</b></p>
     <h3>Danh sách thành viên hội đồng:</h3>
     <table>
         <thead>
@@ -72,12 +72,12 @@ const updateTheses = async (data, id) => {
             include: [
                 {
                     model: db.councilDetails,
-                    attributes: { exclude: ['id', 'councilId'] }
+                    attributes: { exclude: ['councilId'] }
                 }
             ], where: { id: data.councilId }
         });
-        const subject = `Cập nhật hội đồng bảo vệ luận văn. Bạn đã được thêm vào hội đồng: ${newCouncil.code}`;
-        let html = `<p>Thời gian hội đồng diễn ra từ <b>${newCouncil.timeStart.slice(0, -3)}</b> đến <b>${newCouncil.timeEnd.slice(0, -3)}</b> <b>${new Date(newCouncil.startDate).toLocaleDateString('en-GB')}</b></p>
+        const subject = `Cập nhật hội đồng bảo vệ luận văn. Bạn đã được thêm vào hội đồng: HD${newCouncil.id}`;
+        let html = `<p>Địa điểm diễn ra: <b>${newCouncil.code}</b> Thời gian hội đồng diễn ra từ <b>${newCouncil.timeStart.slice(0, -3)}</b> đến <b>${newCouncil.timeEnd.slice(0, -3)}</b> <b>${new Date(newCouncil.startDate).toLocaleDateString('en-GB')}</b></p>
         <h3>Danh sách thành viên hội đồng:</h3>
         <table>
             <thead>
@@ -151,7 +151,6 @@ const getAll = async (page) => {
         include: [
             {
                 model: db.topics,
-                attributes: { exclude: ['id'] }
             },
             {
                 model: db.students,
@@ -167,7 +166,7 @@ const getAll = async (page) => {
             },
             {
                 model: db.councils,
-                attributes: ['code']
+                attributes: ['id','code']
             },
         ],
         limit: pageSize,
@@ -195,7 +194,7 @@ const getAllListTheses = async (page) => {
         include: [
             {
                 model: db.topics,
-                attributes: { exclude: ['id'] }
+             
             },
             {
                 model: db.students,
@@ -276,7 +275,7 @@ const transcript = async (data, id, user) => {
         thesisId: id,
         councilId: data.idCouncil
     });
-  
+
     const updateScore = await db.transcripts.findAll({ where: { thesisId: id } });
 
     if (updateScore.length === 3) {
@@ -285,9 +284,9 @@ const transcript = async (data, id, user) => {
             totalScore += updateScore[i].score;
         }
         let sum = 0;
-        sum = Math.round(totalScore / 3);
-     
-        const updateScoreThese = await db.theses.update({score: sum}, { where: { id: id } });
+        sum = totalScore / 3;
+        const roundedNum = parseFloat(sum.toFixed(1));
+        const updateScoreThese = await db.theses.update({ score: roundedNum }, { where: { id: id } });
 
     }
 
@@ -401,10 +400,10 @@ const listThesesComplete = async (page) => {
     const pageSize = 5;
     const offset = (page - 1) * pageSize;
     const currentPage = parseInt(page);
-    const {rows, count} = await db.theses.findAndCountAll({
+    const { rows, count } = await db.theses.findAndCountAll({
         where: {
             score: { [Op.gt]: 4 },
-        }, 
+        },
         include: [
             {
                 model: db.students,
@@ -429,7 +428,8 @@ const listThesesComplete = async (page) => {
         previousPage, nextPage, lastPage,
         total: count,
         data: rows
-} : BadRequestError(400, 'error!');}
+    } : BadRequestError(400, 'error!');
+}
 
 const searchThesesComplete = async (value, page) => {
     const pageSize = 5;
@@ -464,9 +464,9 @@ const searchThesesComplete = async (value, page) => {
                 { '$student.full_name$': { [Op.like]: `%${value}%` } },
 
             ],
-            
+
             score: { [Op.gt]: 4 },
-            
+
         },
 
         limit: pageSize,
@@ -483,11 +483,12 @@ const searchThesesComplete = async (value, page) => {
         data: rows
     } : BadRequestError(400, 'error!');
 }
+
 const getTotalTheses = async () => {
     const { count, rows } = await db.theses.findAndCountAll({
         where: {
             score: { [Op.gt]: 4 },
-        }, 
+        },
     });
     return rows.length ? {
         total: count,
@@ -495,6 +496,64 @@ const getTotalTheses = async () => {
     } : BadRequestError(400, 'Council not found!');
 }
 
+const exportFileDetailScore = async (id) => {
+    const q1 = await db.transcripts.findAll({
+        attributes: ['id', 'score', 'teacherId'],
+        where: { thesisId: id },
+    });
+    const q2 = await db.theses.findOne({
+        attributes: ['id', 'score'],
+        where: { id: id },
+        include: [
+            {
+                attributes: ['id'],
+                model: db.councils,
+                include: [
+                    {
+                        model: db.councilDetails,
+                        attributes: ['position', 'teacherId']
+                    }, {
+                        model: db.schoolYears,
+                        attributes: ['year', 'semester']
+                    }
+                ]
+            }, {
+                model: db.topics
+            },
+            {
+                model: db.students,
+                attributes: ['account', 'fullName']
+            }, {
+                model: db.councils,
+                attributes: ['code']
+            }
+        ]
+    });
+
+    const newCouncilDetails = q2.council.councildetails.map((cd) => {
+        const transcript = q1.find((t) => t.teacherId === cd.teacherId);
+        if (transcript) {
+            return {
+                // ...cd,
+                "position": cd.position,
+                "teacherId": cd.teacherId,
+                score: transcript.score
+            };
+        }
+        return cd;
+    });
+    let newQ = q2.toJSON();
+    newQ = {
+        ...newQ,
+        council: {
+            ...newQ.council,
+            councildetails: newCouncilDetails
+        }
+    }
+ 
+    return newQ;
+};
+    
 
 module.exports = {
     addTheses,
@@ -512,7 +571,8 @@ module.exports = {
     getAllTopicComplete,
     listThesesComplete,
     searchThesesComplete,
-    getTotalTheses
+    getTotalTheses,
+    exportFileDetailScore
 }
 
 

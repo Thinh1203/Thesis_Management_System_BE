@@ -21,5 +21,6 @@ router.get('/getAllTopicComplete',passport.authenticate('jwt', {session: false})
 router.get('/listThesesComplete',passport.authenticate('jwt', {session: false}), user.requireAdmin,thesesController.listThesesComplete);
 router.get('/searchThesesComplete',thesesController.searchThesesComplete);
 router.get('/getTotalTheses', passport.authenticate('jwt', {session: false}), user.requireAdmin , thesesController.getTotalTheses);
+router.get('/exportFileDetailScore/:id', passport.authenticate('jwt', {session: false}), user.requireAdmin , thesesController.exportFileDetailScore);
 
 module.exports = router;

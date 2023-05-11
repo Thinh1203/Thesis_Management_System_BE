@@ -17,5 +17,6 @@ router.delete('/deleteOne/:id', passport.authenticate('jwt', {session: false}), 
 router.get('/getTotalTeacher', passport.authenticate('jwt', {session: false}), user.requireAdmin , userController.getTotalTeacher);
 router.get('/getListTeacher',passport.authenticate('jwt', {session: false}), user.requireAdmin ,userController.getListTeacher);
 router.get('/getAllCouncil',passport.authenticate('jwt', {session: false}) ,userController.getAllCouncil);
+router.get('/getAllTopicTutorial/:id',passport.authenticate('jwt', {session: false}), user.requireAdmin,userController.getAllTopicTutorial);
 
 module.exports = router;

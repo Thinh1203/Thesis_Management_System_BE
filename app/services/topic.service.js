@@ -3,9 +3,8 @@ const { BadRequestError } = require('../utils/error');
 let csv = require('csvtojson');
 const { Op } = require('sequelize');
 
-const addTopic = async (data, file) => {
+const addTopic = async (data) => {
     result = await db.topics.create({
-        code: data.code,
         VietnameseName: data.VietnameseName,
         EnglishName: data.EnglishName,
     });
@@ -19,12 +18,11 @@ const uploadFile = async (file) => {
     const topic = await csv().fromFile(file.path);
     for (const element of topic) {
         try {
-            const checkTopic = await db.topics.findOne({ where: { code: element.codeTopic } });
-            if (checkTopic) {
-                return ({ statusCode: 400, message: 'Mã đề tài không được trùng nhau!' })
-            }
+            // const checkTopic = await db.topics.findOne({ where: { code: element.codeTopic } });
+            // if (checkTopic) {
+            //     return ({ statusCode: 400, message: 'Mã đề tài không được trùng nhau!' })
+            // }
             result = await db.topics.create({
-                code: element.codeTopic,
                 VietnameseName: element.VietnameseTopicName,
                 EnglishName: element.EnglishTopicName,
             });

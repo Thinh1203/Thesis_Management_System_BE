@@ -147,9 +147,19 @@ const searchThesesComplete = async (req, res) => {
         return res.status(500).json({ message: error });
     }
 }
+
 const getTotalTheses = async (req, res) => {
     try {
         const result = await thesesService.getTotalTheses();
+        return res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error });
+    }
+}
+
+const exportFileDetailScore = async (req, res) => {
+    try {
+        const result = await thesesService.exportFileDetailScore(req.params.id);
         return res.json(result);
     } catch (error) {
         return res.status(500).json({ message: error });
@@ -172,5 +182,6 @@ module.exports = {
     getAllTopicComplete,
     listThesesComplete,
     searchThesesComplete,
-    getTotalTheses
+    getTotalTheses,
+    exportFileDetailScore
 }

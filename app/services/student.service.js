@@ -228,10 +228,9 @@ const getTheses = async (id) => {
         include: [
             {
                 model: db.topics,
-                attributes: { exclude: ['id']}
             }, {
                 model: db.councils,
-                attributes: ['code']
+                attributes: ['id','code']
             }
         ]
     });
@@ -247,7 +246,7 @@ const getThesesDetail = async (id) => {
         include: [
             {
                 model: db.topics,
-                attributes: { exclude: ['id']}
+         
             }, {
                 model: db.councils,
                 attributes: ['code']
